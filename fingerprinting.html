@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const fingerprint = {
+        // Data dasar
+        ua: navigator.userAgent,
+        language: navigator.language,
+        platform: navigator.platform,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+
+        // Data layar
+        screen: `${screen.width}x${screen.height}`,
+        colorDepth: screen.colorDepth,
+
+        // Data hardware
+        cores: navigator.hardwareConcurrency,
+        memory: navigator.deviceMemory || "unknown",
+
+        // Canvas Fingerprint (paling akurat)
+        canvas: (() => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = 200;
+          canvas.height = 50;
+          ctx.textBaseline = "top";
+          ctx.font = "14px Arial";
+          ctx.fillStyle = "#f60";
+          ctx.fillRect(125, 1, 62, 20);
+          ctx.fillStyle = "#069";
+          ctx.fillText("IntelOps", 2, 15);
+          return canvas.toDataURL();
+        })(),
+      };
+
+      console.log(JSON.stringify(fingerprint))
+      // Kirim ke server intel
+      fetch("https://webhook.site/01b31fa9-90d8-4a97-a4c0-00b3643b1ff4", {
+        method: "POST",
+        body: JSON.stringify(fingerprint),
+        // headers: { "Content-Type": "application/json" },
+      });
+
+      // Simpan di localStorage untuk tracking sesi
+      localStorage.setItem("visitor-id", btoa(JSON.stringify(fingerprint)));
+    </script>
+  </body>
+</html>

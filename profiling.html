@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // ====== DETEKSI PERANGKAT ======
+      const deviceInfo = {
+        isMobile:
+          /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+          ),
+        isTablet: /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent),
+        isDesktop:
+          !/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+          ),
+        os: (() => {
+          const ua = navigator.userAgent;
+          if (ua.includes("Windows")) return "Windows";
+          if (ua.includes("Mac")) return "MacOS";
+          if (ua.includes("Linux")) return "Linux";
+          if (ua.includes("Android")) return "Android";
+          if (
+            ua.includes("iOS") ||
+            ua.includes("iPhone") ||
+            ua.includes("iPad")
+          )
+            return "iOS";
+          return "Unknown";
+        })(),
+      };
+
+      // Kirim ke server
+      console.log("📱 Device Info:", deviceInfo);
+
+      // Redirect ke halaman khusus mobile/desktop
+      if (deviceInfo.isMobile) {
+        window.location.href = "mobile-dashboard.html";
+      }
+    </script>
+  </body>
+</html>

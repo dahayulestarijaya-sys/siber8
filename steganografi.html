@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // ====== SEMBUNYIKAN PESAN ======
+      function hideMessageInImage(message) {
+        const canvas = document.createElement("canvas");
+        canvas.width = 200;
+        canvas.height = 100;
+        const ctx = canvas.getContext("2d");
+
+        // Gambar latar biasa (supaya tidak mencurigakan)
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, 200, 100);
+        ctx.fillStyle = "#000000";
+        ctx.font = "20px Arial";
+        ctx.fillText("Foto", 70, 50);
+
+        // Ubah pesan ke binary
+        const binary = message
+          .split("")
+          .map((c) => c.charCodeAt(0).toString(2).padStart(8, "0"))
+          .join("");
+
+        // Sisipkan di pixel (LSB method)
+        const imageData = ctx.getImageData(0, 0, 200, 100);
+        const data = imageData.data;
+
+        for (let i = 0; i < binary.length && i < data.length; i++) {
+          data[i * 4] = (data[i * 4] & 0xfe) | parseInt(binary[i]);
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+
+        // Hasil: gambar dengan pesan tersembunyi
+        return canvas.toDataURL();
+      }
+
+      // ====== BACA PESAN DARI GAMBAR ======
+      function readMessageFromImage(imageData) {
+        const data = imageData.data;
+        let binary = "";
+
+        for (let i = 0; i < data.length && i < 1000; i++) {
+          binary += (data[i * 4] & 1).toString();
+        }
+
+        // Konversi binary ke teks
+        let message = "";
+        for (let i = 0; i < binary.length; i += 8) {
+          const byte = binary.substr(i, 8);
+          if (byte.length === 8) {
+            message += String.fromCharCode(parseInt(byte, 2));
+          }
+        }
+        return message;
+      }
+
+      // Contoh penggunaan
+      const gambarRahasia = hideMessageInImage("Serangan jam 03:00");
+      document.body.innerHTML += `<img src="${gambarRahasia}" alt="Foto">`;
+
+      //   const bacakan = new Image();
+      //   bacakan.src = gambarRahasia;
+      //   bacakan.onload = () => {
+      //     const canvas = document.createElement("canvas");
+      //     canvas.width = bacakan.width;
+      //     canvas.height = bacakan.height;
+      //     const ctx = canvas.getContext("2d");
+      //     ctx.drawImage(bacakan, 0, 0);
+      //     const pesan = readMessageFromImage(ctx.getImageData(0, 0, bacakan.width, bacakan.height));
+      //     console.log("Pesan tersembunyi:", pesan);
+      //   };
+
+      const url = new URL(location.href);
+      if (url.searchParams.get("token") === "Intel2026") {
+        console.log("✅ Akses sah dari:", navigator.userAgent);
+        const bacakan = new Image();
+        bacakan.src = gambarRahasia;
+        bacakan.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = bacakan.width;
+          canvas.height = bacakan.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(bacakan, 0, 0);
+          const pesan = readMessageFromImage(
+            ctx.getImageData(0, 0, bacakan.width, bacakan.height),
+          );
+          console.log("Pesan tersembunyi:", pesan);
+        };
+      } else {
+        // Rekam percobaan ilegal
+        console.warn("🚨 Percobaan ilegal:", location.href);
+      }
+    </script>
+  </body>
+</html>

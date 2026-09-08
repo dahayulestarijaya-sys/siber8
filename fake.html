@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- Tampilkan ini duluan -->
+    <div id="denied">
+      <h1>🚫 ACCESS DENIED</h1>
+      <p>Anda tidak punya izin.</p>
+    </div>
+
+    <!-- Konten asli disembunyikan -->
+    <div id="real-content" style="display: none">
+      <!-- Data intelijen di sini -->
+       <p>Data intelijen akan muncul di sini.</p>
+    </div>
+
+    <script>
+      // Buka akses dengan parameter rahasia
+      const url = new URL(location.href);
+      if (url.searchParams.get("token") === "Intel2026") {
+        document.getElementById("denied").style.display = "none";
+        document.getElementById("real-content").style.display = "block";
+
+        // Rekam siapa yang berhasil masuk
+        console.log("✅ Akses sah dari:", navigator.userAgent);
+      } else {
+        // Rekam percobaan ilegal
+        console.warn("🚨 Percobaan ilegal:", location.href);
+      }
+    </script>
+  </body>
+</html>
