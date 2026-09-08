@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Docker Hello World</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            color: #764ba2;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #444;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .code-block .label {
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: #667eea;
+            color: white;
+            padding: 2px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .tag {
+            color: #569cd6;
+        }
+
+        .code-block .attribute {
+            color: #9cdcfe;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .note strong {
+            color: #856404;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .btn-copy {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-copy:hover {
+            background: #764ba2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-green {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-red {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-blue {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            display: block;
+            padding: 5px 0;
+        }
+
+        .toc a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .command {
+            color: #fff;
+            background: #2d2d2d;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            .btn-copy {
+                display: none;
+            }
+            .code-block {
+                break-inside: avoid;
+            }
+            h2, h3 {
+                break-after: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .code-block {
+                font-size: 12px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="top">
+
+        <h1>🐳 Panduan Lengkap Docker</h1>
+        <p class="subtitle">Membuat Aplikasi Hello World HTML + JavaScript dengan Docker</p>
+
+        <!-- ==================== DAFTAR ISI ==================== -->
+        <div class="toc">
+            <h3 style="margin-top: 0; color: #764ba2;">📋 Daftar Isi</h3>
+            <a href="#step1">1. Persiapan Awal</a>
+            <a href="#step2">2. Membuat File Aplikasi</a>
+            <a href="#step3">3. Membuat Dockerfile</a>
+            <a href="#step4">4. Build Image Docker</a>
+            <a href="#step5">5. Menjalankan Container</a>
+            <a href="#step6">6. Mengatasi Masalah Update Otomatis</a>
+            <a href="#step7">7. Perintah Penting Docker</a>
+            <a href="#step8">8. Docker Compose</a>
+            <a href="#step9">9. Troubleshooting</a>
+            <a href="#cheatsheet">10. Cheat Sheet</a>
+        </div>
+
+        <!-- ==================== STEP 1 ==================== -->
+        <h2 id="step1">🚀 1. Persiapan Awal</h2>
+
+        <h3>1.1 Pastikan Docker Terinstal</h3>
+        <p>Buka terminal/command prompt dan jalankan:</p>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            docker --version
+        </div>
+        <p>Output yang diharapkan: <span class="command">Docker version 24.0.7, build afdd53b</span></p>
+        <div class="note">
+            <strong>📌 Catatan:</strong> Jika belum terinstal, download di 
+            <a href="https://www.docker.com/products/docker-desktop" target="_blank">https://www.docker.com/products/docker-desktop</a>
+        </div>
+
+        <h3>1.2 Buat Folder Proyek</h3>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            mkdir hello-docker
+            cd hello-docker
+        </div>
+
+        <!-- ==================== STEP 2 ==================== -->
+        <h2 id="step2">🚀 2. Membuat File Aplikasi</h2>
+
+        <h3>2.1 File: index.html</h3>
+        <p>Buat file <span class="command">index.html</span> dan copy kode berikut:</p>
+        <div class="code-block">
+            <span class="label">HTML</span>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="id"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Hello Docker&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="container"&gt;
+        &lt;h1 id="greeting"&gt;Loading...&lt;/h1&gt;
+        &lt;button onclick="ubahPesan()"&gt;Klik Saya!&lt;/button&gt;
+        &lt;p id="info"&gt;Aplikasi berjalan di dalam Docker Container&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script src="script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <h3>2.2 File: script.js</h3>
+        <p>Buat file <span class="command">script.js</span> dan copy kode berikut:</p>
+        <div class="code-block">
+            <span class="label">JavaScript</span>
+// Fungsi untuk mengubah pesan saat tombol diklik
+function ubahPesan() {
+    const greeting = document.getElementById('greeting');
+    const messages = [
+        'Hello World dari Docker! 🐳',
+        'Selamat Belajar Docker!',
+        'Container itu keren!',
+        'JavaScript + Docker = ❤️',
+        'Halo dari dalam Container!'
+    ];
+    
+    // Pilih pesan secara acak
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    greeting.textContent = messages[randomIndex];
+    
+    // Efek animasi sederhana
+    greeting.style.transform = 'scale(1.2)';
+    setTimeout(() => {
+        greeting.style.transform = 'scale(1)';
+    }, 300);
+}
+
+// Fungsi ini berjalan otomatis saat halaman dimuat
+window.onload = function() {
+    const greeting = document.getElementById('greeting');
+    greeting.textContent = 'Hello World! 🌍';
+    console.log('Aplikasi berhasil dijalankan di Docker!');
+};
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <h3>2.3 File: style.css</h3>
+        <p>Buat file <span class="command">style.css</span> dan copy kode berikut:</p>
+        <div class="code-block">
+            <span class="label">CSS</span>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    padding: 50px 60px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 500px;
+    transition: transform 0.3s;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+}
+
+h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    font-size: 1.1em;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#info {
+    margin-top: 25px;
+    color: #888;
+    font-size: 0.9em;
+    border-top: 2px solid #f0f0f0;
+    padding-top: 20px;
+}
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <!-- ==================== STEP 3 ==================== -->
+        <h2 id="step3">🚀 3. Membuat Dockerfile</h2>
+
+        <p>Buat file bernama <span class="command">Dockerfile</span> (tanpa ekstensi) dan copy kode berikut:</p>
+        <div class="code-block">
+            <span class="label">Dockerfile</span>
+# Pilih base image (Nginx versi alpine yang ringan)
+FROM nginx:alpine
+
+# Hapus file default Nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy semua file aplikasi ke dalam container
+COPY index.html /usr/share/nginx/html/
+COPY script.js /usr/share/nginx/html/
+COPY style.css /usr/share/nginx/html/
+
+# Expose port 80 (port default Nginx)
+EXPOSE 80
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <div class="note">
+            <strong>📌 Penjelasan:</strong>
+            <ul>
+                <li><span class="command">FROM nginx:alpine</span> → Menggunakan Nginx versi ringan (~20MB)</li>
+                <li><span class="command">RUN rm -rf</span> → Membersihkan file default Nginx</li>
+                <li><span class="command">COPY</span> → Menyalin file dari komputer ke container</li>
+                <li><span class="command">EXPOSE 80</span> → Memberi tahu Docker akan menggunakan port 80</li>
+            </ul>
+        </div>
+
+        <!-- ==================== STEP 4 ==================== -->
+        <h2 id="step4">🚀 4. Build Image Docker</h2>
+
+        <h3>4.1 Build Image</h3>
+        <p>Jalankan perintah di terminal (pastikan berada di folder <span class="command">hello-docker</span>):</p>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            docker build -t hello-web .
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <div class="success">
+            <strong>✅ Output yang diharapkan:</strong><br>
+            <span style="font-family: monospace; font-size: 0.9em;">
+            [+] Building 2.3s (8/8) FINISHED<br>
+             => [1/4] FROM docker.io/library/nginx:alpine<br>
+             => [2/4] RUN rm -rf /usr/share/nginx/html/*<br>
+             => [3/4] COPY index.html /usr/share/nginx/html/<br>
+             => [4/4] COPY script.js /usr/share/nginx/html/<br>
+             => exporting to image<br>
+             => => naming to docker.io/library/hello-web
+            </span>
+        </div>
+
+        <h3>4.2 Cek Image yang Telah Dibuat</h3>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            docker images
+        </div>
+        <p>Anda akan melihat image <span class="command">hello-web</span> di daftar.</p>
+
+        <!-- ==================== STEP 5 ==================== -->
+        <h2 id="step5">🚀 5. Menjalankan Container</h2>
+
+        <h3>5.1 Jalankan Container</h3>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            docker run -d -p 8080:80 --name hello-container hello-web
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <div class="note">
+            <strong>📌 Penjelasan:</strong>
+            <ul>
+                <li><span class="command">docker run</span> → Menjalankan container</li>
+                <li><span class="command">-d</span> → Detached mode (berjalan di background)</li>
+                <li><span class="command">-p 8080:80</span> → Mapping port 8080 (host) ke 80 (container)</li>
+                <li><span class="command">--name hello-container</span> → Nama container</li>
+                <li><span class="command">hello-web</span> → Nama image</li>
+            </ul>
+        </div>
+
+        <h3>5.2 Cek Container Berjalan</h3>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            docker ps
+        </div>
+
+        <h3>5.3 Buka di Browser</h3>
+        <p>Akses: <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></p>
+
+        <div class="success">
+            <strong>✅ Uji Coba Aplikasi:</strong>
+            <ul>
+                <li>Klik tombol "Klik Saya!"</li>
+                <li>Pesan akan berubah-ubah setiap kali tombol diklik</li>
+                <li>Anda akan melihat halaman Hello World yang cantik</li>
+            </ul>
+        </div>
+
+        <!-- ==================== STEP 6 ==================== -->
+        <h2 id="step6">🚀 6. Mengatasi Masalah Update Otomatis</h2>
+
+        <div class="warning">
+            <strong>⚠️ MASALAH:</strong> Ketika Anda mengubah file, container tidak otomatis mendeteksi perubahan.
+        </div>
+
+        <h3>SOLUSI 1: Volume Mounting (Untuk Development)</h3>
+
+        <h4>6.1 Hentikan container lama:</h4>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            docker stop hello-container
+            docker rm hello-container
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <h4>6.2 Jalankan dengan volume mount:</h4>
+
+        <p><strong>Untuk Linux/Mac:</strong></p>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            docker run -d -p 8080:80 -v $(pwd):/usr/share/nginx/html --name hello-dev hello-web
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <p><strong>Untuk Windows (Command Prompt):</strong></p>
+        <div class="code-block">
+            <span class="label">CMD</span>
+            docker run -d -p 8080:80 -v %cd%:/usr/share/nginx/html --name hello-dev hello-web
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <p><strong>Untuk Windows (PowerShell):</strong></p>
+        <div class="code-block">
+            <span class="label">PowerShell</span>
+            docker run -d -p 8080:80 -v ${PWD}:/usr/share/nginx/html --name hello-dev hello-web
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <div class="success">
+            <strong>✅ Sekarang coba ubah file:</strong>
+            <ul>
+                <li>Edit <span class="command">index.html</span>, <span class="command">script.js</span>, atau <span class="command">style.css</span></li>
+                <li>Refresh browser di <span class="command">http://localhost:8080</span></li>
+                <li>Perubahan akan langsung terlihat! ✨</li>
+            </ul>
+        </div>
+
+        <h3>SOLUSI 2: Rebuild Image (Untuk Production)</h3>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            # Build ulang image
+            docker build -t hello-web .
+
+            # Hentikan container lama
+            docker stop hello-container
+            docker rm hello-container
+
+            # Jalankan container baru
+            docker run -d -p 8080:80 --name hello-container hello-web
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <!-- ==================== STEP 7 ==================== -->
+        <h2 id="step7">🚀 7. Perintah Penting Docker</h2>
+
+        <h3>7.1 Manajemen Container</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Perintah</th>
+                    <th>Fungsi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="command">docker ps</span></td>
+                    <td>Melihat container yang berjalan</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker ps -a</span></td>
+                    <td>Melihat semua container (termasuk yang berhenti)</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker stop hello-container</span></td>
+                    <td>Menghentikan container</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker start hello-container</span></td>
+                    <td>Menjalankan container yang sudah berhenti</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker rm hello-container</span></td>
+                    <td>Menghapus container</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker logs hello-container</span></td>
+                    <td>Melihat log container</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker logs -f hello-container</span></td>
+                    <td>Melihat log secara real-time</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker exec -it hello-container sh</span></td>
+                    <td>Masuk ke dalam container (untuk debugging)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>7.2 Manajemen Image</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Perintah</th>
+                    <th>Fungsi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="command">docker images</span></td>
+                    <td>Melihat semua image</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker rmi hello-web</span></td>
+                    <td>Menghapus image</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker image prune</span></td>
+                    <td>Menghapus semua image yang tidak digunakan</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ==================== STEP 8 ==================== -->
+        <h2 id="step8">🚀 8. Docker Compose (Opsional)</h2>
+
+        <h3>8.1 Buat File docker-compose.yml</h3>
+        <p>Buat file bernama <span class="command">docker-compose.yml</span> dan copy kode berikut:</p>
+        <div class="code-block">
+            <span class="label">YAML</span>
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: hello-dev
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/usr/share/nginx/html
+    # Untuk development, override command agar Nginx tidak cache
+    command: nginx -g "daemon off;"
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <h3>8.2 Perintah Docker Compose</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Perintah</th>
+                    <th>Fungsi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="command">docker-compose up -d</span></td>
+                    <td>Menjalankan container</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker-compose logs -f</span></td>
+                    <td>Melihat log</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker-compose down</span></td>
+                    <td>Menghentikan container</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker-compose up -d --build</span></td>
+                    <td>Rebuild dan jalankan ulang</td>
+                </tr>
+                <tr>
+                    <td><span class="command">docker-compose ps</span></td>
+                    <td>Melihat status</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ==================== STEP 9 ==================== -->
+        <h2 id="step9">🚀 9. Troubleshooting</h2>
+
+        <h3>Masalah 1: Port sudah digunakan</h3>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            # Cek proses yang menggunakan port 8080
+            # Linux/Mac:
+            sudo lsof -i :8080
+
+            # Windows:
+            netstat -ano | findstr :8080
+
+            # Gunakan port berbeda
+            docker run -d -p 8081:80 --name hello-container hello-web
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <h3>Masalah 2: Permission denied (Linux/Mac)</h3>
+        <p>Tambahkan <span class="command">:delegated</span> pada volume:</p>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            docker run -d -p 8080:80 -v $(pwd):/usr/share/nginx/html:delegated --name hello-dev hello-web
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <h3>Masalah 3: Perubahan tidak terlihat</h3>
+        <ul>
+            <li>Hard refresh browser: <span class="command">Ctrl+Shift+R</span> atau <span class="command">Ctrl+F5</span></li>
+            <li>Bersihkan cache browser</li>
+            <li>Cek log container: <span class="command">docker logs hello-dev</span></li>
+        </ul>
+
+        <h3>Masalah 4: Container tidak bisa dihapus</h3>
+        <div class="code-block">
+            <span class="label">Terminal</span>
+            # Hentikan dulu container
+            docker stop hello-container
+
+            # Baru hapus
+            docker rm hello-container
+
+            # Atau hapus paksa
+            docker rm -f hello-container
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <!-- ==================== CHEAT SHEET ==================== -->
+        <h2 id="cheatsheet">🚀 10. Cheat Sheet</h2>
+
+        <div class="code-block">
+            <span class="label">Docker Cheat Sheet</span>
+# 1. Build image
+docker build -t hello-web .
+
+# 2. Jalankan container (tanpa auto-update)
+docker run -d -p 8080:80 --name hello-container hello-web
+
+# 3. Jalankan container (dengan auto-update - Linux/Mac)
+docker run -d -p 8080:80 -v $(pwd):/usr/share/nginx/html --name hello-dev hello-web
+
+# 4. Jalankan container (dengan auto-update - Windows CMD)
+docker run -d -p 8080:80 -v %cd%:/usr/share/nginx/html --name hello-dev hello-web
+
+# 5. Jalankan container (dengan auto-update - Windows PowerShell)
+docker run -d -p 8080:80 -v ${PWD}:/usr/share/nginx/html --name hello-dev hello-web
+
+# 6. Hentikan container
+docker stop hello-dev
+
+# 7. Hapus container
+docker rm hello-dev
+
+# 8. Hapus image
+docker rmi hello-web
+
+# 9. Lihat log
+docker logs -f hello-dev
+
+# 10. Docker Compose
+docker-compose up -d
+docker-compose down
+            <button class="btn-copy" onclick="copyCode(this)">📋 Copy</button>
+        </div>
+
+        <!-- ==================== PERBANDINGAN METODE ==================== -->
+        <h2>📊 Perbandingan Metode</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Metode</th>
+                    <th>Kecepatan</th>
+                    <th>Auto Update</th>
+                    <th>Digunakan Untuk</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Volume Mount</strong></td>
+                    <td><span class="badge badge-green">⚡ Sangat Cepat</span></td>
+                    <td><span class="badge badge-green">✅ Ya</span></td>
+                    <td>Development</td>
+                </tr>
+                <tr>
+                    <td><strong>Rebuild Image</strong></td>
+                    <td><span class="badge badge-red">🐢 Lambat</span></td>
+                    <td><span class="badge badge-red">❌ Tidak</span></td>
+                    <td>Production</td>
+                </tr>
+                <tr>
+                    <td><strong>Live-server</strong></td>
+                    <td><span class="badge badge-green">⚡ Cepat</span></td>
+                    <td><span class="badge badge-green">✅ Ya (auto-refresh)</span></td>
+                    <td>Development</td>
+                </tr>
+                <tr>
+                    <td><strong>Docker Compose</strong></td>
+                    <td><span class="badge badge-green">⚡ Cepat</span></td>
+                    <td><span class="badge badge-green">✅ Ya</span></td>
+                    <td>Development</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ==================== HASIL AKHIR ==================== -->
+        <h2>🎯 Hasil Akhir</h2>
+
+        <div class="success">
+            <strong>✅ Setelah mengikuti semua langkah, Anda memiliki:</strong>
+            <ul>
+                <li>✅ Aplikasi web HTML + JavaScript yang interaktif</li>
+                <li>✅ Dikemas dalam Docker container</li>
+                <li>✅ Bisa diakses di <span class="command">http://localhost:8080</span></li>
+                <li>✅ Auto-update untuk perubahan file (dengan volume mount)</li>
+                <li>✅ Siap untuk di-deploy di mana saja</li>
+            </ul>
+        </div>
+
+        <!-- ==================== SUMBER DAYA ==================== -->
+        <h2>📚 Sumber Daya Tambahan</h2>
+
+        <ul>
+            <li>📖 Dokumentasi Resmi Docker: <a href="https://docs.docker.com" target="_blank">https://docs.docker.com</a></li>
+            <li>📦 Docker Hub: <a href="https://hub.docker.com" target="_blank">https://hub.docker.com</a></li>
+            <li>🐳 Docker Compose Documentation: <a href="https://docs.docker.com/compose/" target="_blank">https://docs.docker.com/compose/</a></li>
+            <li>🌐 Nginx Docker Image: <a href="https://hub.docker.com/_/nginx" target="_blank">https://hub.docker.com/_/nginx</a></li>
+            <li>🎮 Play with Docker: <a href="https://labs.play-with-docker.com" target="_blank">https://labs.play-with-docker.com</a></li>
+        </ul>
+
+        <!-- ==================== FOOTER ==================== -->
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
+
+        <div style="text-align: center; color: #888; padding: 20px 0;">
+            <p style="font-size: 1.2em; color: #667eea;">🏁 SELESAI</p>
+            <p>Selamat! Anda sekarang sudah bisa membuat dan menjalankan aplikasi web dengan Docker. 🎉</p>
+            <p style="font-size: 0.9em; margin-top: 15px;">
+                <em>Dokumen ini dibuat untuk keperluan pembelajaran Docker.</em><br>
+                <em>Terima kasih telah mengikuti panduan ini! 🐳</em>
+            </p>
+            <p style="margin-top: 20px;">
+                <a href="#top" style="color: #667eea; text-decoration: none; font-weight: bold;">⬆ Kembali ke Atas</a>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Fungsi untuk copy kode
+        function copyCode(button) {
+            // Dapatkan elemen code block
+            const codeBlock = button.parentElement;
+            // Ambil teks (tanpa tombol copy)
+            const codeText = codeBlock.textContent.replace('📋 Copy', '').trim();
+            
+            // Copy ke clipboard
+            navigator.clipboard.writeText(codeText).then(() => {
+                // Ubah teks tombol sementara
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                // Fallback: select dan copy manual
+                const textarea = document.createElement('textarea');
+                textarea.value = codeText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Smooth scroll untuk link di daftar isi
+        document.querySelectorAll('.toc a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
