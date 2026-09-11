@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <form>
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <button type="button" onclick="login()">Login</button>
+
+        <script>
+            function login() {
+                const username = document.querySelector('input[name="username"]').value;
+                const password = document.querySelector('input[name="password"]').value;
+
+                // Simulasi login sederhana
+                if (username === "admin" && password === "password") {
+                    alert("Login berhasil!");
+                    // Redirect ke halaman lain atau lakukan tindakan lain
+                } else {
+                    alert("Username atau password salah!");
+                }
+            }
+        </script>
+    </form>
+</body>
+</html>
