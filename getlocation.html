@@ -1,21 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPS Location</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #0f172a; color: #fff; }
+    button { padding: 12px 24px; font-size: 16px; background: #3b82f6; color: #fff;
+             border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #2563eb; }
+    button:disabled { background: #64748b; cursor: not-allowed; }
+    #demo { margin-top: 20px; padding: 16px; background: #1e293b; border-radius: 8px;
+            min-height: 40px; white-space: pre-line; }
+    .error { color: #f87171; }
+    .success { color: #4ade80; }
+    a { color: #38bdf8; }
+  </style>
+</head>
 <body>
-<button onclick="getLocation()">Dapatkan Lokasi</button>
-<p id="demo"></p>
+  <h1>📍 Deteksi Lokasi</h1>
+  <button id="btn" onclick="getLocation()">Dapatkan Lokasi</button>
+  <p id="demo">Klik tombol di atas untuk mulai.</p>
 
-<script>
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  }
-}
-function showPosition(position) {
-  document.getElementById("demo").innerHTML =
-    "Lat: " + position.coords.latitude +
-    "<br>Lon: " + position.coords.longitude +
-    "<br>Akurasi: " + position.coords.accuracy + " meter";
-}
-</script>
+  <script>
+    function getLocation() {
+      const demo = document.getElementById("demo");
+      const btn = document.getElementById("btn");
+
+      if (!navigator.geolocation) {
+        demo.innerHTML = '<span class="error">❌ Browser tidak mendukung Geolocation</span>';
+        return;
+      }
+
+      btn.disabled = true;
+      demo.innerHTML = "🔄 Mendeteksi lokasi...\n\nJika muncul popup izin, klik ALLOW.";
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const acc = position.coords.accuracy;
+          const mapLink = "https://www.google.com/maps?q=" + lat + "," + lon;
+
+          demo.innerHTML =
+            '<span class="success">✅ Lokasi ditemukan!</span>\n\n' +
+            'Latitude : ' + lat + '\n' +
+            'Longitude: ' + lon + '\n' +
+            'Akurasi  : ±' + acc.toFixed(0) + ' meter\n\n' +
+            '<a href="' + mapLink + '" target="_blank">🗺️ Buka di Google Maps</a>';
+          btn.disabled = false;
+        },
+        function(error) {
+          let pesan = "";
+          if (error.code === 1) {
+            pesan = "❌ Izin lokasi DITOLAK.\n\n" +
+                    "Cara fix:\n" +
+                    "1. Klik ikon 🔒 di address bar\n" +
+                    "2. Pilih 'Site settings' / 'Izin situs'\n" +
+                    "3. Location → Allow\n" +
+                    "4. Refresh halaman ini";
+          } else if (error.code === 2) {
+            pesan = "❌ Lokasi tidak tersedia.\nPastikan GPS aktif.";
+          } else if (error.code === 3) {
+            pesan = "❌ Timeout. Coba klik tombol lagi.";
+          } else {
+            pesan = "❌ Error: " + error.message;
+          }
+          demo.innerHTML = '<span class="error">' + pesan + '</span>';
+          btn.disabled = false;
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+      );
+    }
+  </script>
 </body>
 </html>
