@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+<button onclick="getLocation()">Dapatkan Lokasi</button>
+<p id="demo"></p>
+
+<script>
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  }
+}
+function showPosition(position) {
+  document.getElementById("demo").innerHTML =
+    "Lat: " + position.coords.latitude +
+    "<br>Lon: " + position.coords.longitude +
+    "<br>Akurasi: " + position.coords.accuracy + " meter";
+}
+</script>
+</body>
+</html>
