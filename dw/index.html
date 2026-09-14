@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materi Pelajaran: Membuat Website Tor di Linux</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #7c3aed;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --code-bg: #0b1220;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  header {
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 30px;
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-size: 28px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .meta span {
+    background: var(--bg);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+  }
+
+  h2 {
+    font-size: 22px;
+    color: var(--accent);
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  h3 {
+    font-size: 17px;
+    color: var(--text);
+    margin-top: 25px;
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    font-size: 15px;
+    color: var(--accent2);
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  ul, ol {
+    margin-left: 25px;
+    margin-bottom: 15px;
+  }
+
+  li { margin-bottom: 6px; }
+
+  code {
+    background: var(--code-bg);
+    color: #7dd3fc;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 13px;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    overflow-x: auto;
+    margin-bottom: 15px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  pre code {
+    background: none;
+    color: #e2e8f0;
+    padding: 0;
+    font-size: 13px;
+  }
+
+  .step {
+    background: var(--bg);
+    border-left: 4px solid var(--accent);
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .step-num {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: 14px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    text-align: left;
+  }
+
+  th {
+    background: var(--bg);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  tr:nth-child(even) td {
+    background: rgba(15, 23, 42, 0.5);
+  }
+
+  .note {
+    background: rgba(56, 189, 248, 0.1);
+    border-left: 4px solid var(--accent);
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin: 15px 0;
+    font-size: 14px;
+  }
+
+  .warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-left: 4px solid var(--warning);
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin: 15px 0;
+    font-size: 14px;
+  }
+
+  .danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 4px solid var(--danger);
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin: 15px 0;
+    font-size: 14px;
+  }
+
+  .success {
+    background: rgba(34, 197, 94, 0.1);
+    border-left: 4px solid var(--success);
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin: 15px 0;
+    font-size: 14px;
+  }
+
+  details {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin: 10px 0;
+  }
+
+  summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  details[open] summary {
+    margin-bottom: 10px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .badge-green { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+  .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+  .badge-blue { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
+  .badge-purple { background: rgba(124, 58, 237, 0.2); color: #a78bfa; }
+
+  .toc {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin-bottom: 30px;
+  }
+
+  .toc h3 {
+    margin-top: 0;
+    color: var(--accent);
+  }
+
+  .toc ol {
+    margin-bottom: 0;
+  }
+
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  .toc a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .worksheet {
+    background: var(--bg);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 30px;
+  }
+
+  .worksheet-line {
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+    margin: 10px 0;
+    min-height: 25px;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 2px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .checkbox {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-radius: 3px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  @media print {
+    body {
+      background: white;
+      color: black;
+      padding: 0;
+    }
+    .container {
+      box-shadow: none;
+      background: white;
+      border-radius: 0;
+      padding: 20px;
+    }
+    h1, h2, h3, h4 { color: #000; }
+    .step { background: #f5f5f5; border-left-color: #333; }
+    pre { background: #f5f5f5; color: #000; border-color: #ccc; }
+    code { background: #f0f0f0; color: #000; }
+    th { background: #eee; color: #000; }
+    .toc, .worksheet { background: #f9f9f9; }
+    .note, .warning, .danger, .success { background: #f5f5f5; }
+    .footer { color: #666; }
+    a { color: #000; }
+    .badge { border: 1px solid #ccc; }
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 20px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    pre { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🧅 Membuat Website Tor (Onion Service) di Linux</h1>
+  <p class="subtitle">Materi Pelajaran Praktik — Dari Nol sampai Online di Dark Web</p>
+  <div class="meta">
+    <span>📚 Level: Pemula</span>
+    <span>⏱️ Durasi: ~30 menit</span>
+    <span>💻 Platform: Linux</span>
+    <span>🎯 Prasyarat: Terminal + Internet</span>
+  </div>
+</header>
+
+<!-- TOC -->
+<div class="toc">
+  <h3>📖 Daftar Isi</h3>
+  <ol>
+    <li><a href="#tujuan">Tujuan Pembelajaran</a></li>
+    <li><a href="#konsep">Konsep Dasar</a></li>
+    <li><a href="#praktik">Praktik: 8 Langkah</a></li>
+    <li><a href="#keamanan">Keamanan & Etika</a></li>
+    <li><a href="#ringkasan">Ringkasan & Kuis</a></li>
+    <li><a href="#lampiran">Lampiran</a></li>
+    <li><a href="#worksheet">Lembar Kerja Siswa</a></li>
+  </ol>
+</div>
+
+<!-- SECTION 1 -->
+<h2 id="tujuan">🎯 1. Tujuan Pembelajaran</h2>
+<p>Setelah menyelesaikan materi ini, siswa mampu:</p>
+<ol>
+  <li>Menjelaskan perbedaan <strong>Surface Web</strong>, <strong>Deep Web</strong>, dan <strong>Dark Web</strong></li>
+  <li>Menjelaskan cara kerja <strong>Onion Service</strong></li>
+  <li>Membuat <strong>Onion Service</strong> sendiri di Linux</li>
+  <li>Mengakses Onion Service via <strong>Tor Browser</strong></li>
+  <li>Memahami aspek <strong>keamanan & legalitas</strong></li>
+</ol>
+
+<!-- SECTION 2 -->
+<h2 id="konsep">📖 2. Konsep Dasar (5 Menit)</h2>
+
+<h3>2.1 Tiga Lapisan Internet</h3>
+<table>
+  <thead>
+    <tr><th>Lapisan</th><th>Definisi</th><th>Contoh</th><th>Ukuran</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Surface Web</strong></td><td>Terindeks mesin pencari</td><td>Google, YouTube</td><td>~5%</td></tr>
+    <tr><td><strong>Deep Web</strong></td><td>Tidak terindeks, perlu login</td><td>Email, bank</td><td>~95%</td></tr>
+    <tr><td><strong>Dark Web</strong></td><td>Butuh Tor, anonim</td><td>.onion sites</td><td>&lt;1%</td></tr>
+  </tbody>
+</table>
+
+<h3>2.2 Apa Itu Onion Service?</h3>
+<p><strong>Onion Service</strong> = website yang hanya bisa diakses via jaringan Tor, dengan alamat <code>.onion</code>.</p>
+<p><strong>Karakteristik:</strong></p>
+<ul>
+  <li>✅ Anonim (IP tersembunyi)</li>
+  <li>✅ Alamat unik (56 karakter)</li>
+  <li>✅ Tidak bisa diakses browser biasa</li>
+  <li>✅ Tidak ada registrasi terpusat</li>
+</ul>
+
+<h3>2.3 Analogi Sederhana</h3>
+<pre><code>Surface Web  = Rumah dengan alamat di peta
+Deep Web     = Rumah dengan pagar & kunci
+Dark Web     = Rumah di lorong bawah tanah rahasia
+               (hanya yang tahu lorong bisa masuk)</code></pre>
+
+<!-- SECTION 3 -->
+<h2 id="praktik">🛠️ 3. Praktik: 8 Langkah (20 Menit)</h2>
+
+<!-- STEP 1 -->
+<div class="step">
+  <h3><span class="step-num">1</span> Install Tools (3 menit)</h3>
+  <p>Buka <strong>Terminal</strong>, sesuaikan perintah dengan distro Anda:</p>
+
+  <h4>Ubuntu / Debian / Linux Mint / Pop!_OS</h4>
+  <pre><code>sudo apt update
+sudo apt install tor python3 torbrowser-launcher -y</code></pre>
+
+  <h4>Fedora / RHEL / CentOS</h4>
+  <pre><code>sudo dnf install tor python3 torbrowser-launcher -y</code></pre>
+
+  <h4>Arch / Manjaro</h4>
+  <pre><code>sudo pacman -S tor python torbrowser-launcher</code></pre>
+
+  <h4>openSUSE</h4>
+  <pre><code>sudo zypper install tor python3 torbrowser-launcher</code></pre>
+
+  <div class="success">
+    <strong>✅ Verifikasi:</strong>
+    <pre style="margin-top:8px;"><code>tor --version
+# Output: Tor version 0.4.x.x
+
+python3 --version
+# Output: Python 3.x.x</code></pre>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step">
+  <h3><span class="step-num">2</span> Siapkan Folder Konten (2 menit)</h3>
+  <pre><code># Buat folder terpisah untuk konten (PENTING!)
+mkdir -p ~/onion-site
+cd ~/onion-site
+
+# Buat file index.html
+cat &gt; index.html &lt;&lt; 'EOF'
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Onion Service Pertama Saya&lt;/title&gt;
+  &lt;style&gt;
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { color: #38bdf8; }
+    .badge {
+      background: #7c3aed;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="badge"&gt;🧅 Onion Service&lt;/div&gt;
+  &lt;h1&gt;Halo dari Dark Web!&lt;/h1&gt;
+  &lt;p&gt;Ini website Tor pertama saya di Linux.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+EOF</code></pre>
+
+  <div class="danger">
+    <strong>⚠️ PENTING:</strong> Jangan taruh file di folder <code>/var/lib/tor/hidden_service/</code> — folder itu hanya untuk kunci rahasia!
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step">
+  <h3><span class="step-num">3</span> Konfigurasi Tor (3 menit)</h3>
+  <p>Konfigurasi Tor di Linux ada di <code>/etc/tor/torrc</code>. Ada <strong>dua cara</strong> — pilih salah satu.</p>
+
+  <h4>Cara A: Pakai systemctl (Direkomendasikan)</h4>
+  <pre><code># Edit file konfigurasi Tor
+sudo nano /etc/tor/torrc</code></pre>
+  <p>Cari dan <strong>hapus tanda <code>#</code></strong> di depan dua baris ini:</p>
+  <pre><code>HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 80 127.0.0.1:8080</code></pre>
+  <p><strong>Simpan:</strong> <code>Ctrl + O</code> → <code>Enter</code> → <code>Ctrl + X</code></p>
+
+  <h4>Cara B: Pakai File Konfigurasi Sendiri (Untuk Belajar)</h4>
+  <pre><code># Buat file konfigurasi custom
+nano ~/torrc</code></pre>
+  <p>Isi:</p>
+  <pre><code>SocksPort 9050
+HiddenServiceDir /home/NAMA_USER/.tor/hidden_service/
+HiddenServicePort 80 127.0.0.1:8080</code></pre>
+  <div class="note">Ganti <code>NAMA_USER</code> dengan username Linux Anda (cek: <code>whoami</code>)</div>
+  <p><strong>Simpan:</strong> <code>Ctrl + O</code> → <code>Enter</code> → <code>Ctrl + X</code></p>
+</div>
+
+<!-- STEP 4 -->
+<div class="step">
+  <h3><span class="step-num">4</span> Jalankan Web Server (2 menit)</h3>
+  <p><strong>Terminal 1</strong> — biarkan terbuka:</p>
+  <pre><code>cd ~/onion-site
+python3 -m http.server 8080 --bind 127.0.0.1</code></pre>
+  <div class="success">✅ Output: <code>Serving HTTP on 127.0.0.1 port 8080...</code></div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step">
+  <h3><span class="step-num">5</span> Jalankan Tor (3 menit)</h3>
+  <p>Pilih sesuai cara konfigurasi Anda:</p>
+
+  <h4>Kalau pakai Cara A (systemctl):</h4>
+  <pre><code>sudo systemctl restart tor
+sudo systemctl enable tor   # agar otomatis jalan saat boot</code></pre>
+
+  <h4>Kalau pakai Cara B (file sendiri):</h4>
+  <pre><code># Terminal 2 — biarkan terbuka
+tor -f ~/torrc</code></pre>
+
+  <p>Tunggu hingga muncul:</p>
+  <pre><code>Bootstrapped 100% (done)</code></pre>
+</div>
+
+<!-- STEP 6 -->
+<div class="step">
+  <h3><span class="step-num">6</span> Dapatkan Alamat .onion (1 menit)</h3>
+  <p><strong>Terminal 3:</strong></p>
+
+  <h4>Kalau pakai Cara A:</h4>
+  <pre><code>sudo cat /var/lib/tor/hidden_service/hostname</code></pre>
+
+  <h4>Kalau pakai Cara B:</h4>
+  <pre><code>cat ~/.tor/hidden_service/hostname</code></pre>
+
+  <p>Output:</p>
+  <pre><code>wvltwi6ebzidebcgy6y2wptlrkph3swkvybszhpywgpcys5pbq4tts2qd.onion</code></pre>
+  <div class="note">📝 <strong>Catat alamat ini!</strong> Ini alamat unik website Anda.</div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step">
+  <h3><span class="step-num">7</span> Akses via Tor Browser (3 menit)</h3>
+  <p><strong>Jalankan Tor Browser:</strong></p>
+  <pre><code>torbrowser-launcher</code></pre>
+  <p>Atau cari <strong>Tor Browser</strong> di application menu.</p>
+
+  <p><strong>Langkah:</strong></p>
+  <ol>
+    <li>Klik <strong>Connect</strong> → tunggu "Connected"</li>
+    <li>Ketik alamat <code>.onion</code> Anda di address bar</li>
+    <li><strong>Halaman muncul!</strong> 🎉</li>
+  </ol>
+
+  <p><strong>Cek koneksi Tor (opsional):</strong></p>
+  <pre><code>https://check.torproject.org</code></pre>
+</div>
+
+<!-- STEP 8 -->
+<div class="step">
+  <h3><span class="step-num">8</span> Uji Keamanan (3 menit)</h3>
+
+  <h4>Test 1: Akses dari browser biasa</h4>
+  <p>Buka Firefox/Chrome → ketik alamat <code>.onion</code></p>
+  <p>Hasil: <span class="badge badge-red">❌ Gagal</span> — karena bukan jaringan Tor</p>
+
+  <h4>Test 2: Cek file kunci tidak terekspos</h4>
+  <p>Di Tor Browser, buka: <code>http://[alamat].onion/hostname</code></p>
+  <p>Hasil: <span class="badge badge-green">✅ 404 Not Found</span> — artinya folder konten terpisah dari kunci</p>
+
+  <h4>Test 3: Cek dari device lain</h4>
+  <p>Install Onion Browser di iPhone → connect Tor → buka alamat <code>.onion</code></p>
+  <p>Hasil: <span class="badge badge-green">✅ Bisa diakses</span> (selama komputer Linux menyala)</p>
+</div>
+
+<!-- SECTION 4 -->
+<h2 id="keamanan">🔒 4. Keamanan & Etika (5 Menit)</h2>
+
+<h3>4.1 Checklist Keamanan</h3>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Folder konten terpisah dari kunci</td><td>✅</td></tr>
+    <tr><td>Web server bind ke <code>127.0.0.1</code></td><td>✅</td></tr>
+    <tr><td>Tidak ada file <code>.env</code> / password di folder konten</td><td>✅</td></tr>
+    <tr><td>Kunci privat di-backup</td><td>⬜</td></tr>
+    <tr><td>Tor Browser tidak login akun pribadi</td><td>✅</td></tr>
+    <tr><td>Permission folder kunci <code>700</code></td><td>✅</td></tr>
+  </tbody>
+</table>
+
+<h3>4.2 Struktur Folder yang Aman</h3>
+<h4>Cara A (systemctl):</h4>
+<pre><code>/var/lib/tor/hidden_service/    ← 🔒 HANYA kunci (owner: debian-tor)
+├── hostname
+├── hs_ed25519_secret_key
+└── hs_ed25519_public_key
+
+~/onion-site/                    ← 🌐 Konten publik
+└── index.html</code></pre>
+
+<h4>Cara B (file sendiri):</h4>
+<pre><code>~/.tor/hidden_service/           ← 🔒 HANYA kunci
+├── hostname
+├── hs_ed25519_secret_key
+└── hs_ed25519_public_key
+
+~/onion-site/                    ← 🌐 Konten publik
+└── index.html</code></pre>
+
+<h3>4.3 Permission yang Benar</h3>
+<pre><code># Untuk Cara B (user biasa)
+chmod 700 ~/.tor/hidden_service/
+
+# Untuk Cara A (systemctl)
+sudo chown -R debian-tor:debian-tor /var/lib/tor/hidden_service/
+sudo chmod 700 /var/lib/tor/hidden_service/</code></pre>
+
+<h3>4.4 Backup Kunci (WAJIB!)</h3>
+<pre><code># Cara A
+sudo cp -r /var/lib/tor/hidden_service/ ~/backup-onion-$(date +%Y%m%d)/
+
+# Cara B
+cp -r ~/.tor/hidden_service/ ~/backup-onion-$(date +%Y%m%d)/
+
+# Amankan backup
+chmod -R 700 ~/backup-onion-*/</code></pre>
+
+<div class="danger">
+  <strong>⚠️ Kalau kunci hilang → alamat .onion hilang selamanya!</strong>
+</div>
+
+<h3>4.5 Legalitas</h3>
+<table>
+  <thead>
+    <tr><th>Aktivitas</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Belajar Tor & Onion Service</td><td><span class="badge badge-green">✅ Legal</span></td></tr>
+    <tr><td>Hosting blog pribadi</td><td><span class="badge badge-green">✅ Legal</span></td></tr>
+    <tr><td>Jurnalisme & whistleblowing</td><td><span class="badge badge-green">✅ Legal</span></td></tr>
+    <tr><td>Jual beli narkoba</td><td><span class="badge badge-red">❌ ILEGAL</span></td></tr>
+    <tr><td>Jual data curian</td><td><span class="badge badge-red">❌ ILEGAL</span></td></tr>
+    <tr><td>Konten pelecehan anak</td><td><span class="badge badge-red">❌ ILEGAL</span></td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 5 -->
+<h2 id="ringkasan">🎓 5. Ringkasan & Kuis (2 Menit)</h2>
+
+<h3>5.1 Alur Lengkap</h3>
+<pre><code>[1] Install Tor          → sudo apt install tor
+        ↓
+[2] Siapkan konten       → ~/onion-site/index.html
+        ↓
+[3] Konfigurasi Tor      → /etc/tor/torrc
+        ↓
+[4] Jalankan web server  → python3 -m http.server 8080
+        ↓
+[5] Jalankan Tor         → sudo systemctl restart tor
+        ↓
+[6] Dapat alamat .onion  → sudo cat /var/lib/tor/hidden_service/hostname
+        ↓
+[7] Akses via Tor Browser → http://[alamat].onion</code></pre>
+
+<h3>5.2 Kuis Singkat</h3>
+
+<details>
+  <summary>1. Apa perbedaan Deep Web dan Dark Web?</summary>
+  <p>Deep Web = tidak terindeks tapi legal (email, bank). Dark Web = bagian Deep Web yang butuh Tor, anonim.</p>
+</details>
+
+<details>
+  <summary>2. Kenapa folder konten harus terpisah dari folder kunci?</summary>
+  <p>Agar file kunci (hostname, private key) tidak terekspos ke publik via web server.</p>
+</details>
+
+<details>
+  <summary>3. Apa perbedaan Cara A (systemctl) dan Cara B (file sendiri)?</summary>
+  <p>Cara A = Tor jalan sebagai service, otomatis start saat boot, owner <code>debian-tor</code>. Cara B = Tor jalan manual sebagai user biasa, cocok untuk belajar.</p>
+</details>
+
+<details>
+  <summary>4. Apa yang terjadi jika komputer Linux dimatikan?</summary>
+  <p>Onion Service tidak bisa diakses. Alamat .onion tetap ada, tapi server offline.</p>
+</details>
+
+<details>
+  <summary>5. Kenapa permission folder hidden_service harus 700?</summary>
+  <p>Agar hanya owner yang bisa baca/tulis/akses. Tor menolak jalan jika permission terlalu terbuka, karena kunci privat sangat sensitif.</p>
+</details>
+
+<!-- SECTION 6 -->
+<h2 id="lampiran">📋 6. Lampiran</h2>
+
+<h3>6.1 Perintah Penting per Distro</h3>
+<table>
+  <thead>
+    <tr><th>Perintah</th><th>Ubuntu/Debian</th><th>Fedora</th><th>Arch</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Install Tor</td><td><code>sudo apt install tor</code></td><td><code>sudo dnf install tor</code></td><td><code>sudo pacman -S tor</code></td></tr>
+    <tr><td>Install Tor Browser</td><td><code>sudo apt install torbrowser-launcher</code></td><td><code>sudo dnf install torbrowser-launcher</code></td><td><code>sudo pacman -S torbrowser-launcher</code></td></tr>
+    <tr><td>Restart Tor</td><td><code>sudo systemctl restart tor</code></td><td><code>sudo systemctl restart tor</code></td><td><code>sudo systemctl restart tor</code></td></tr>
+    <tr><td>Cek status Tor</td><td><code>sudo systemctl status tor</code></td><td><code>sudo systemctl status tor</code></td><td><code>sudo systemctl status tor</code></td></tr>
+    <tr><td>Lihat log Tor</td><td><code>sudo journalctl -u tor -f</code></td><td><code>sudo journalctl -u tor -f</code></td><td><code>sudo journalctl -u tor -f</code></td></tr>
+  </tbody>
+</table>
+
+<h3>6.2 Troubleshooting Umum</h3>
+<table>
+  <thead>
+    <tr><th>Error</th><th>Penyebab</th><th>Solusi</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Tor failed to start</td><td>Permission folder salah</td><td><code>sudo chown -R debian-tor:debian-tor /var/lib/tor/hidden_service/</code></td></tr>
+    <tr><td>Permission denied</td><td>Bukan owner folder</td><td>Cek dengan <code>ls -la</code>, sesuaikan owner</td></tr>
+    <tr><td>Address already in use</td><td>Port 8080 sudah dipakai</td><td>Ganti port: <code>python3 -m http.server 8081</code></td></tr>
+    <tr><td>Tor Browser won't launch</td><td>Belum di-extract</td><td>Jalankan <code>torbrowser-launcher</code> sekali untuk setup</td></tr>
+    <tr><td>.onion not found</td><td>Propagasi descriptor</td><td>Tunggu 1-2 menit, restart Tor</td></tr>
+    <tr><td>Connection refused</td><td>Web server mati</td><td>Cek <code>ps aux | grep http.server</code></td></tr>
+  </tbody>
+</table>
+
+<h3>6.3 Pengembangan Lanjutan</h3>
+<table>
+  <thead>
+    <tr><th>Ide</th><th>Tingkat</th><th>Tools</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Tambah halaman kedua</td><td>Pemula</td><td>HTML</td></tr>
+    <tr><td>Tambah CSS & gambar</td><td>Pemula</td><td>HTML/CSS</td></tr>
+    <tr><td>Dynamic content</td><td>Menengah</td><td>Flask/Python</td></tr>
+    <tr><td>Database</td><td>Menengah</td><td>SQLite</td></tr>
+    <tr><td>Production server</td><td>Lanjut</td><td>Nginx + VPS</td></tr>
+    <tr><td>HTTPS end-to-end</td><td>Lanjut</td><td>TLS</td></tr>
+    <tr><td>Docker</td><td>Lanjut</td><td>Docker + Compose</td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 7 -->
+<h2 id="worksheet">📝 7. Lembar Kerja Siswa</h2>
+
+<div class="worksheet">
+  <p><strong>Nama:</strong></p>
+  <div class="worksheet-line"></div>
+
+  <p><strong>Tanggal:</strong></p>
+  <div class="worksheet-line"></div>
+
+  <p><strong>Distro Linux:</strong></p>
+  <div class="worksheet-line"></div>
+
+  <p><strong>Alamat .onion saya:</strong></p>
+  <div class="worksheet-line"></div>
+  <div class="worksheet-line"></div>
+
+  <p><strong>Cara konfigurasi yang dipakai:</strong></p>
+  <p><span class="checkbox"></span> Cara A (systemctl) &nbsp;&nbsp; <span class="checkbox"></span> Cara B (file sendiri)</p>
+
+  <p style="margin-top:20px;"><strong>Refleksi:</strong></p>
+
+  <p>1. Apa hal paling menarik yang Anda pelajari?</p>
+  <div class="worksheet-line"></div>
+  <div class="worksheet-line"></div>
+
+  <p>2. Apa perbedaan utama Onion Service vs website biasa?</p>
+  <div class="worksheet-line"></div>
+  <div class="worksheet-line"></div>
+
+  <p>3. Apa yang akan Anda lakukan selanjutnya?</p>
+  <div class="worksheet-line"></div>
+  <div class="worksheet-line"></div>
+
+  <p style="margin-top:20px;"><strong>Tanda tangan:</strong></p>
+  <div class="worksheet-line"></div>
+</div>
+
+<div class="footer">
+  <p>🎉 <strong>Selamat! Anda telah menyelesaikan materi "Membuat Website Tor di Linux"</strong></p>
+  <p style="margin-top:10px;">Materi ini dapat digunakan untuk workshop, mata kuliah, komunitas, atau self-learning.</p>
+  <p style="margin-top:10px;">Lisensi: Bebas digunakan untuk edukasi, dengan atribusi.</p>
+</div>
+
+</div>
+</body>
+</html>
