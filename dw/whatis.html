@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materi Dasar: Surface Web, Deep Web, Dark Web</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --card: #131a2b;
+    --border: #1e2a44;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --code-bg: #060912;
+    --highlight: #fbbf24;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 950px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 45px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    border: 1px solid var(--border);
+  }
+
+  header {
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 30px;
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-size: 30px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .meta span {
+    background: var(--bg);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+  }
+
+  h2 {
+    font-size: 23px;
+    color: var(--accent);
+    margin-top: 45px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  h3 {
+    font-size: 18px;
+    color: var(--text);
+    margin-top: 28px;
+    margin-bottom: 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent2);
+  }
+
+  p { margin-bottom: 14px; }
+
+  ul, ol {
+    margin-left: 25px;
+    margin-bottom: 15px;
+  }
+
+  li { margin-bottom: 8px; }
+
+  strong { color: var(--highlight); }
+
+  code {
+    background: var(--code-bg);
+    color: #7dd3fc;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 13px;
+    border: 1px solid var(--border);
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin-bottom: 15px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    color: #e2e8f0;
+    padding: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  th, td {
+    border: 1px solid var(--border);
+    padding: 11px 13px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--bg);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  tr:nth-child(even) td {
+    background: rgba(10, 14, 26, 0.5);
+  }
+
+  .note, .warning, .danger, .success, .info {
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin: 18px 0;
+    font-size: 14px;
+    border-left: 4px solid;
+  }
+
+  .note {
+    background: rgba(56, 189, 248, 0.08);
+    border-left-color: var(--accent);
+  }
+
+  .warning {
+    background: rgba(245, 158, 11, 0.08);
+    border-left-color: var(--warning);
+  }
+
+  .danger {
+    background: rgba(239, 68, 68, 0.08);
+    border-left-color: var(--danger);
+  }
+
+  .success {
+    background: rgba(34, 197, 94, 0.08);
+    border-left-color: var(--success);
+  }
+
+  .info {
+    background: rgba(167, 139, 250, 0.08);
+    border-left-color: var(--accent2);
+  }
+
+  .analogy {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(56, 189, 248, 0.1));
+    border: 1px solid var(--accent2);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+
+  .analogy::before {
+    content: "💡 Analogi:";
+    display: block;
+    color: var(--accent2);
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-x: auto;
+    color: #7dd3fc;
+    white-space: pre;
+  }
+
+  .toc {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 28px;
+    margin-bottom: 35px;
+  }
+
+  .toc h3 {
+    margin-top: 0;
+    color: var(--accent);
+    border: none;
+    padding: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+  }
+
+  .toc ol {
+    margin-bottom: 0;
+    columns: 2;
+    column-gap: 30px;
+  }
+
+  .toc li {
+    break-inside: avoid;
+    margin-bottom: 6px;
+  }
+
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+
+  .toc a:hover {
+    color: var(--accent);
+    padding-left: 5px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .badge-green { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+  .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+  .badge-blue { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
+  .badge-purple { background: rgba(167, 139, 250, 0.2); color: var(--accent2); }
+  .badge-yellow { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+
+  details {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+  }
+
+  summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  details[open] summary {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .layer-card {
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px 0;
+    border: 2px solid;
+  }
+
+  .layer-surface {
+    background: rgba(34, 197, 94, 0.05);
+    border-color: var(--success);
+  }
+
+  .layer-deep {
+    background: rgba(56, 189, 248, 0.05);
+    border-color: var(--accent);
+  }
+
+  .layer-dark {
+    background: rgba(167, 139, 250, 0.05);
+    border-color: var(--accent2);
+  }
+
+  .layer-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .layer-surface .layer-title { color: var(--success); }
+  .layer-deep .layer-title { color: var(--accent); }
+  .layer-dark .layer-title { color: var(--accent2); }
+
+  .footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .footer p { margin-bottom: 8px; }
+
+  .iceberg {
+    text-align: center;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #7dd3fc;
+    background: var(--code-bg);
+    padding: 25px;
+    border-radius: 10px;
+    margin: 20px 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  @media print {
+    body { background: white; color: black; padding: 0; }
+    .container { box-shadow: none; background: white; border: none; padding: 20px; }
+    h1, h2, h3 { color: #000; }
+    pre, code, .diagram, .iceberg { background: #f5f5f5; color: #000; border-color: #ccc; }
+    th { background: #eee; color: #000; }
+    .toc, .analogy, details { background: #f9f9f9; }
+    .note, .warning, .danger, .success, .info { background: #f5f5f5; }
+    .footer { color: #666; }
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 22px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    pre { font-size: 12px; }
+    .toc ol { columns: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🌐 Materi Dasar: Tiga Lapisan Internet</h1>
+  <p class="subtitle">Surface Web, Deep Web, dan Dark Web — Fondasi Sebelum Praktik</p>
+  <div class="meta">
+    <span>📖 Level: Pemula</span>
+    <span>⏱️ Durasi: ~30 menit</span>
+    <span>🎯 Prasyarat: Tidak ada</span>
+    <span>💡 Tujuan: Paham konsep</span>
+  </div>
+</header>
+
+<!-- TOC -->
+<div class="toc">
+  <h3>📖 Daftar Isi</h3>
+  <ol>
+    <li><a href="#pengantar">Pengantar: Analogi Gunung Es</a></li>
+    <li><a href="#surface">Surface Web</a></li>
+    <li><a href="#deep">Deep Web</a></li>
+    <li><a href="#dark">Dark Web</a></li>
+    <li><a href="#perbandingan">Perbandingan Lengkap</a></li>
+    <li><a href="#mitos">Mitos yang Perlu Diluruskan</a></li>
+    <li><a href="#kuis">Kuis Pemahaman</a></li>
+  </ol>
+</div>
+
+<!-- ============================================ -->
+<!-- PENGANTAR -->
+<!-- ============================================ -->
+<h2 id="pengantar">🧊 1. Pengantar: Analogi Gunung Es</h2>
+
+<p>Internet sering dianalogikan sebagai <strong>gunung es</strong>. Yang terlihat di permukaan hanya sebagian kecil, sedangkan bagian terbesar tersembunyi di bawah air.</p>
+
+<div class="iceberg">                    ☁️  ☁️  ☁️
+                 🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊
+              ╔══════════════════════════╗
+              ║      SURFACE WEB         ║  ← Terlihat
+              ║      (~5%)               ║     (Google, YouTube)
+              ╚══════════════════════════╝
+        🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊🌊
+     ┌────────────────────────────────────────────┐
+     │                                            │
+     │              DEEP WEB                      │  ← Tersembunyi
+     │              (~95%)                        │     (Email, bank)
+     │                                            │
+     │    ┌────────────────────────────────┐      │
+     │    │       DARK WEB (<1%)           │      │  ← Sangat
+     │    │       (Butuh Tor)              │      │     tersembunyi
+     │    └────────────────────────────────┘      │
+     │                                            │
+     └────────────────────────────────────────────┘</div>
+
+<div class="analogy">
+Bayangkan internet seperti <strong>gunung es</strong>:
+<ul style="margin-top:10px;">
+  <li><strong>Surface Web</strong> = bagian yang terlihat di atas air</li>
+  <li><strong>Deep Web</strong> = bagian besar di bawah air (masih bagian gunung es)</li>
+  <li><strong>Dark Web</strong> = gua rahasia di dasar gunung es</li>
+</ul>
+</div>
+
+<div class="info">
+<strong>💡 Poin Penting:</strong> Ketiganya adalah <strong>bagian dari internet yang sama</strong>, bukan internet yang berbeda. Yang membedakan adalah <strong>cara mengakses</strong> dan <strong>tingkat indeks</strong>.
+</div>
+
+<!-- ============================================ -->
+<!-- SURFACE WEB -->
+<!-- ============================================ -->
+<h2 id="surface">🟢 2. Surface Web</h2>
+
+<div class="layer-card layer-surface">
+  <div class="layer-title">🟢 Surface Web — "Internet Publik"</div>
+  <p>Bagian internet yang <strong>terlihat dan terindeks</strong> oleh mesin pencari seperti Google, Bing, atau Yahoo.</p>
+</div>
+
+<h3>2.1 Karakteristik</h3>
+
+<table>
+  <thead>
+    <tr><th>Aspek</th><th>Keterangan</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Indeks</strong></td><td>✅ Ya, oleh mesin pencari</td></tr>
+    <tr><td><strong>Akses</strong></td><td>Browser biasa (Chrome, Firefox, Safari)</td></tr>
+    <tr><td><strong>Ukuran</strong></td><td>~5% dari total internet</td></tr>
+    <tr><td><strong>Registrasi</strong></td><td>Perlu (domain, hosting)</td></tr>
+    <tr><td><strong>Keamanan</strong></td><td>HTTPS (TLS)</td></tr>
+    <tr><td><strong>Anonim</strong></td><td>❌ Tidak</td></tr>
+  </tbody>
+</table>
+
+<h3>2.2 Contoh</h3>
+
+<ul>
+  <li>🔍 Mesin pencari: Google, Bing, DuckDuckGo</li>
+  <li>📰 Berita: CNN, Kompas, BBC</li>
+  <li>📱 Media sosial: Facebook, Twitter, Instagram</li>
+  <li>🛒 E-commerce: Amazon, Tokopedia, Shopee</li>
+  <li>🎥 Video: YouTube, Vimeo</li>
+  <li>📚 Ensiklopedia: Wikipedia</li>
+  <li>📝 Blog pribadi</li>
+</ul>
+
+<h3>2.3 Cara Kerja Indeks</h3>
+
+<div class="diagram">[Google Crawler] → kunjungi website → baca konten
+       ↓
+[Google Index] → simpan di database raksasa
+       ↓
+[User Search] → "cara membuat kue" → tampilkan hasil</div>
+
+<div class="note">
+<strong>💡 Catatan:</strong> Tidak semua website Surface Web terindeks. Beberapa memilih untuk <code>noindex</code> agar tidak muncul di Google.
+</div>
+
+<!-- ============================================ -->
+<!-- DEEP WEB -->
+<!-- ============================================ -->
+<h2 id="deep">🔵 3. Deep Web</h2>
+
+<div class="layer-card layer-deep">
+  <div class="layer-title">🔵 Deep Web — "Internet Privat"</div>
+  <p>Bagian internet yang <strong>tidak terindeks</strong> mesin pencari, tapi <strong>legal</strong> dan <strong>biasa</strong>. Anda mengaksesnya setiap hari!</p>
+</div>
+
+<h3>3.1 Karakteristik</h3>
+
+<table>
+  <thead>
+    <tr><th>Aspek</th><th>Keterangan</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Indeks</strong></td><td>❌ Tidak terindeks</td></tr>
+    <tr><td><strong>Akses</strong></td><td>Login, URL spesifik, langganan</td></tr>
+    <tr><td><strong>Ukuran</strong></td><td>~95% dari total internet</td></tr>
+    <tr><td><strong>Registrasi</strong></td><td>Bervariasi (akun, langganan)</td></tr>
+    <tr><td><strong>Keamanan</strong></td><td>HTTPS + autentikasi</td></tr>
+    <tr><td><strong>Anonim</strong></td><td>⚠️ Sedang (tergantung layanan)</td></tr>
+  </tbody>
+</table>
+
+<h3>3.2 Kenapa Tidak Terindeks?</h3>
+
+<ol>
+  <li><strong>Butuh login</strong> — Halaman inbox email Anda tidak muncul di Google</li>
+  <li><strong>Konten dinamis</strong> — Dibuat saat diminta (misal hasil pencarian)</li>
+  <li><strong>Dilindungi password</strong> — Intranet perusahaan, panel admin</li>
+  <li><strong>File di database</strong> — Jurnal akademik, arsip</li>
+  <li><strong>Robots.txt</strong> — Website melarang crawler</li>
+  <li><strong>Langganan berbayar</strong> — Netflix, Spotify</li>
+</ol>
+
+<h3>3.3 Contoh Deep Web (Anda Pakai Setiap Hari!)</h3>
+
+<table>
+  <thead>
+    <tr><th>Kategori</th><th>Contoh</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>📧 Email</td><td>Gmail, Yahoo Mail, Outlook</td></tr>
+    <tr><td>🏦 Perbankan</td><td>BCA Mobile, Mandiri Online</td></tr>
+    <tr><td>📱 Media sosial</td><td>DM Instagram, chat WhatsApp</td></tr>
+    <tr><td>📚 Akademik</td><td>JSTOR, ProQuest, Google Scholar (full text)</td></tr>
+    <tr><td>🎬 Streaming</td><td>Netflix, Disney+, Spotify</td></tr>
+    <tr><td>🏢 Intranet</td><td>Portal karyawan, panel admin</td></tr>
+    <tr><td>☁️ Cloud storage</td><td>Google Drive, Dropbox</td></tr>
+    <tr><td>💊 Kesehatan</td><td>Rekam medis online</td></tr>
+  </tbody>
+</table>
+
+<div class="success">
+<strong>✅ Poin Penting:</strong> Deep Web <strong>bukan</strong> tempat ilegal. Deep Web adalah <strong>internet privat</strong> yang Anda pakai setiap hari untuk email, m-banking, dan media sosial.
+</div>
+
+<div class="analogy">
+<strong>Deep Web</strong> seperti <strong>rumah Anda</strong> — ada pintu, ada kunci, hanya orang tertentu yang bisa masuk. Tapi bukan berarti isinya ilegal!
+</div>
+
+<!-- ============================================ -->
+<!-- DARK WEB -->
+<!-- ============================================ -->
+<h2 id="dark">🟣 4. Dark Web</h2>
+
+<div class="layer-card layer-dark">
+  <div class="layer-title">🟣 Dark Web — "Internet Anonim"</div>
+  <p>Bagian kecil dari Deep Web yang <strong>sengaja disembunyikan</strong> dan butuh <strong>Tor</strong> untuk mengaksesnya. Dirancang untuk anonimitas.</p>
+</div>
+
+<h3>4.1 Karakteristik</h3>
+
+<table>
+  <thead>
+    <tr><th>Aspek</th><th>Keterangan</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Indeks</strong></td><td>❌ Tidak terindeks</td></tr>
+    <tr><td><strong>Akses</strong></td><td>Tor Browser (wajib)</td></tr>
+    <tr><td><strong>Ukuran</strong></td><td>&lt;1% dari total internet</td></tr>
+    <tr><td><strong>Registrasi</strong></td><td>Tidak ada (otomatis dari kunci)</td></tr>
+    <tr><td><strong>Keamanan</strong></td><td>End-to-end encrypted (via Tor)</td></tr>
+    <tr><td><strong>Anonim</strong></td><td>✅ Tinggi</td></tr>
+  </tbody>
+</table>
+
+<h3>4.2 Kenapa Butuh Tor?</h3>
+
+<ul>
+  <li>🔒 Menyembunyikan IP pengguna <strong>dan</strong> server</li>
+  <li>🔒 Traffic dienkripsi berlapis (onion routing)</li>
+  <li>🔒 Tidak bisa di-resolve DNS biasa</li>
+  <li>🔒 Tidak bisa diakses Chrome/Safari biasa</li>
+  <li>🔒 Alamat <code>.onion</code> unik (56 karakter)</li>
+</ul>
+
+<h3>4.3 Contoh Dark Web</h3>
+
+<h4>✅ Legal & Positif</h4>
+<ul>
+  <li>📰 <strong>Jurnalisme</strong> — SecureDrop (NYT, Guardian)</li>
+  <li>🗣️ <strong>Forum anonim</strong> — diskusi privat</li>
+  <li>📚 <strong>Perpustakaan</strong> — arsip buku terlarang</li>
+  <li>🔒 <strong>Whistleblowing</strong> — lapor korupsi</li>
+  <li>🎓 <strong>Riset keamanan</strong> — belajar Tor</li>
+</ul>
+
+<h4>❌ Ilegal</h4>
+<ul>
+  <li>💊 Pasar narkoba (Silk Road, dll)</li>
+  <li>🔫 Jual senjata ilegal</li>
+  <li>💳 Jual data kartu kredit curian</li>
+  <li>🚨 Konten pelecehan anak</li>
+  <li>💀 Layanan peretasan</li>
+</ul>
+
+<div class="danger">
+<strong>🚨 PENTING:</strong> Dark Web <strong>tidak otomatis ilegal</strong>. Yang ilegal adalah <strong>aktivitasnya</strong>, bukan alatnya. Tor sendiri legal dan digunakan jutaan orang untuk tujuan sah.
+</div>
+
+<h3>4.4 Bagaimana Cara Akses Dark Web?</h3>
+
+<ol>
+  <li>Download <strong>Tor Browser</strong> dari <code>torproject.org</code></li>
+  <li>Install dan jalankan</li>
+  <li>Klik <strong>Connect</strong> → tunggu sampai "Connected"</li>
+  <li>Ketik alamat <code>.onion</code> di address bar</li>
+  <li>Halaman muncul</li>
+</ol>
+
+<div class="note">
+<strong>💡 Catatan:</strong> Untuk <strong>membuat</strong> Onion Service sendiri, Anda perlu menjalankan Tor + web server di komputer. Materi praktik akan dibahas terpisah.
+</div>
+
+<!-- ============================================ -->
+<!-- PERBANDINGAN -->
+<!-- ============================================ -->
+<h2 id="perbandingan">📊 5. Perbandingan Lengkap</h2>
+
+<h3>5.1 Tabel Utama</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Aspek</th>
+      <th style="color: var(--success);">Surface Web</th>
+      <th style="color: var(--accent);">Deep Web</th>
+      <th style="color: var(--accent2);">Dark Web</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Definisi</strong></td>
+      <td>Terindeks publik</td>
+      <td>Tidak terindeks, privat</td>
+      <td>Anonim, butuh Tor</td>
+    </tr>
+    <tr>
+      <td><strong>Akses</strong></td>
+      <td>Browser biasa</td>
+      <td>Login / URL</td>
+      <td>Tor Browser</td>
+    </tr>
+    <tr>
+      <td><strong>Indeks</strong></td>
+      <td>✅ Ya</td>
+      <td>❌ Tidak</td>
+      <td>❌ Tidak</td>
+    </tr>
+    <tr>
+      <td><strong>Ukuran</strong></td>
+      <td>~5%</td>
+      <td>~95%</td>
+      <td>&lt;1%</td>
+    </tr>
+    <tr>
+      <td><strong>Anonim</strong></td>
+      <td>❌</td>
+      <td>⚠️ Sedang</td>
+      <td>✅ Tinggi</td>
+    </tr>
+    <tr>
+      <td><strong>Legalitas</strong></td>
+      <td>Umumnya legal</td>
+      <td>Umumnya legal</td>
+      <td>Campuran</td>
+    </tr>
+    <tr>
+      <td><strong>Contoh</strong></td>
+      <td>Google, YouTube</td>
+      <td>Email, bank</td>
+      <td>.onion sites</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>5.2 Diagram Hubungan</h3>
+
+<div class="diagram">        INTERNET (100%)
+┌─────────────────────────────────────┐
+│                                     │
+│   ┌───────────────────────────┐     │
+│   │      DEEP WEB (~95%)      │     │
+│   │                           │     │
+│   │   ┌───────────────┐       │     │
+│   │   │  DARK WEB     │       │     │
+│   │   │  (&lt;1%)        │       │     │
+│   │   └───────────────┘       │     │
+│   │                           │     │
+│   └───────────────────────────┘     │
+│                                     │
+│   ┌─────────────┐                   │
+│   │SURFACE WEB  │                   │
+│   │  (~5%)      │                   │
+│   └─────────────┘                   │
+│                                     │
+└─────────────────────────────────────┘
+
+Dark Web ⊂ Deep Web ⊂ Internet</div>
+
+<div class="info">
+<strong>💡 Poin Penting:</strong> Dark Web adalah <strong>bagian dari Deep Web</strong>. Deep Web adalah <strong>bagian dari Internet</strong>. Ketiganya bukan internet yang berbeda — hanya cara akses dan tingkat indeks yang berbeda.
+</div>
+
+<!-- ============================================ -->
+<!-- MITOS -->
+<!-- ============================================ -->
+<h2 id="mitos">🎭 6. Mitos yang Perlu Diluruskan</h2>
+
+<details>
+  <summary>❌ Mitos 1: "Dark Web = Deep Web"</summary>
+  <p><strong>Salah.</strong> Dark Web adalah <strong>bagian kecil</strong> dari Deep Web. Deep Web jauh lebih besar dan mencakup email, m-banking, dll yang legal.</p>
+</details>
+
+<details>
+  <summary>❌ Mitos 2: "Deep Web itu ilegal"</summary>
+  <p><strong>Salah.</strong> Deep Web adalah internet privat yang Anda pakai setiap hari. Gmail Anda ada di Deep Web. M-banking Anda ada di Deep Web.</p>
+</details>
+
+<details>
+  <summary>❌ Mitos 3: "Dark Web penuh hacker"</summary>
+  <p><strong>Salah.</strong> Dark Web punya banyak konten legal: jurnalisme, forum privasi, perpustakaan, SecureDrop. Hacker memang ada, tapi bukan mayoritas.</p>
+</details>
+
+<details>
+  <summary>❌ Mitos 4: "Pakai Tor = otomatis ilegal"</summary>
+  <p><strong>Salah.</strong> Tor legal di sebagian besar negara. Digunakan jurnalis, aktivis, peneliti, dan individu peduli privasi.</p>
+</details>
+
+<details>
+  <summary>❌ Mitos 5: "Dark Web tidak bisa dilacak"</summary>
+  <p><strong>Salah.</strong> Dengan teknik tertentu (traffic correlation, 0-day exploit), pihak berwenang bisa melacak. Banyak operasi FBI berhasil menangkap operator Dark Web.</p>
+</details>
+
+<details>
+  <summary>❌ Mitos 6: "Deep Web = 90% internet"</summary>
+  <p><strong>Sebagian benar.</strong> Estimasi bervariasi, tapi Deep Web memang jauh lebih besar dari Surface Web. Namun angkanya tidak pasti — tergantung definisi.</p>
+</details>
+
+<details>
+  <summary>❌ Mitos 7: "Surface Web = Google"</summary>
+  <p><strong>Salah.</strong> Google hanya <strong>search engine</strong>, bukan Surface Web. Surface Web mencakup semua website yang bisa diindeks.</p>
+</details>
+
+<!-- ============================================ -->
+<!-- KUIS -->
+<!-- ============================================ -->
+<h2 id="kuis">🎓 7. Kuis Pemahaman</h2>
+
+<p>Jawab pertanyaan berikut untuk menguji pemahaman Anda:</p>
+
+<details>
+  <summary>1. Apa perbedaan utama Surface Web, Deep Web, dan Dark Web?</summary>
+  <p><strong>Jawaban:</strong></p>
+  <ul>
+    <li><strong>Surface Web</strong> = terindeks mesin pencari, akses browser biasa</li>
+    <li><strong>Deep Web</strong> = tidak terindeks, butuh login/URL spesifik</li>
+    <li><strong>Dark Web</strong> = bagian Deep Web yang butuh Tor, anonim</li>
+  </ul>
+</details>
+
+<details>
+  <summary>2. Apakah Deep Web itu ilegal?</summary>
+  <p><strong>Jawaban:</strong> Tidak. Deep Web adalah internet privat yang legal — email, m-banking, media sosial, dll. Anda pakai setiap hari.</p>
+</details>
+
+<details>
+  <summary>3. Kenapa Dark Web butuh Tor?</summary>
+  <p><strong>Jawaban:</strong> Karena Tor:
+  <ul>
+    <li>Menyembunyikan IP pengguna dan server</li>
+    <li>Mengenkripsi traffic berlapis</li>
+    <li>Memungkinkan alamat .onion yang tidak bisa di-resolve DNS biasa</li>
+  </ul>
+  </p>
+</details>
+
+<details>
+  <summary>4. Apakah Dark Web itu bagian dari Deep Web?</summary>
+  <p><strong>Jawaban:</strong> Ya. Dark Web adalah <strong>subset</strong> dari Deep Web. Semua Dark Web adalah Deep Web, tapi tidak semua Deep Web adalah Dark Web.</p>
+</details>
+
+<details>
+  <summary>5. Sebutkan 3 contoh Deep Web yang Anda pakai setiap hari!</summary>
+  <p><strong>Jawaban (contoh):</strong>
+  <ul>
+    <li>Email (Gmail, Yahoo Mail)</li>
+    <li>M-banking (BCA Mobile, Mandiri Online)</li>
+    <li>Media sosial (DM Instagram, chat WhatsApp)</li>
+  </ul>
+  </p>
+</details>
+
+<details>
+  <summary>6. Apakah pakai Tor itu ilegal?</summary>
+  <p><strong>Jawaban:</strong> Tidak. Tor legal di sebagian besar negara. Yang ilegal adalah <strong>aktivitasnya</strong> (narkoba, senjata, CSAM), bukan alatnya.</p>
+</details>
+
+<details>
+  <summary>7. Berapa persen kira-kira ukuran Surface Web dari total internet?</summary>
+  <p><strong>Jawaban:</strong> ~5%. Deep Web ~95%, Dark Web &lt;1%.</p>
+</details>
+
+<details>
+  <summary>8. Kenapa halaman email Anda tidak muncul di Google?</summary>
+  <p><strong>Jawaban:</strong> Karena halaman email ada di <strong>Deep Web</strong> — butuh login, tidak diindeks, dan bersifat privat.</p>
+</details>
+
+<details>
+  <summary>9. Apa yang membuat Dark Web "gelap"?</summary>
+  <p><strong>Jawaban:</strong> Bukan karena isinya (meskipun ada yang ilegal), tapi karena
