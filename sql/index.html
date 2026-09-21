@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materi Belajar PostgreSQL CRUD — Step by Step</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f0f2f5;
+        color: #2c3e50;
+        line-height: 1.7;
+    }
+
+    /* ====== SIDEBAR ====== */
+    .sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        width: 270px;
+        height: 100vh;
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 25px 18px;
+        overflow-y: auto;
+        z-index: 100;
+    }
+    .sidebar h2 {
+        font-size: 15px;
+        color: #3498db;
+        margin-bottom: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        padding: 9px 12px;
+        color: #bdc3c7;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-bottom: 3px;
+        font-size: 13.5px;
+        transition: all 0.2s;
+    }
+    .sidebar a:hover {
+        background: #34495e;
+        color: #fff;
+        padding-left: 16px;
+    }
+    .sidebar a.active {
+        background: #3498db;
+        color: #fff;
+        font-weight: 600;
+    }
+    .sidebar .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        background: #3498db;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 11px;
+        font-weight: bold;
+        margin-right: 9px;
+    }
+    .sidebar a.active .step-num {
+        background: #fff;
+        color: #3498db;
+    }
+
+    /* ====== CONTENT ====== */
+    .content {
+        margin-left: 270px;
+        padding: 40px 50px;
+        max-width: 980px;
+    }
+
+    /* ====== HEADER ====== */
+    .header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .header p { opacity: 0.95; font-size: 15px; }
+
+    /* ====== SECTION ====== */
+    .section {
+        background: #fff;
+        padding: 35px 40px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        scroll-margin-top: 20px;
+    }
+    .section h2 {
+        font-size: 22px;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #3498db;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .section h2 .badge {
+        background: #3498db;
+        color: #fff;
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .section h3 {
+        font-size: 17px;
+        color: #34495e;
+        margin: 25px 0 12px;
+    }
+    .section p { margin-bottom: 12px; }
+    .section ul, .section ol {
+        margin: 12px 0 12px 25px;
+    }
+    .section li { margin-bottom: 6px; }
+    .section code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        color: #c0392b;
+    }
+
+    /* ====== CODE BLOCK ====== */
+    .code {
+        background: #1e272e;
+        color: #ecf0f1;
+        padding: 18px 20px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        margin: 15px 0;
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 1.6;
+        border-left: 4px solid #3498db;
+    }
+    .code .kw { color: #e74c3c; font-weight: bold; }
+    .code .str { color: #2ecc71; }
+    .code .num { color: #f39c12; }
+    .code .cmt { color: #7f8c8d; font-style: italic; }
+    .code .prompt { color: #3498db; font-weight: bold; }
+    .code .err { color: #e74c3c; }
+    .code .ok { color: #2ecc71; }
+
+    /* ====== BOX ====== */
+    .box {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-size: 14px;
+        border-left: 5px solid;
+    }
+    .box-info    { background: #e8f4fd; border-color: #3498db; }
+    .box-warning { background: #fff3cd; border-color: #f39c12; }
+    .box-danger  { background: #f8d7da; border-color: #e74c3c; }
+    .box-success { background: #d4edda; border-color: #27ae60; }
+    .box strong { display: block; margin-bottom: 5px; }
+    .box ul { margin: 8px 0 0 20px; }
+    .box li { margin-bottom: 4px; }
+
+    /* ====== TABLE ====== */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+        font-size: 14px;
+    }
+    th, td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    th {
+        background: #f8f9fa;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    tr:hover { background: #f8f9fa; }
+
+    /* ====== CHECKLIST ====== */
+    .checklist {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    .checklist label {
+        display: block;
+        padding: 8px 0;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .checklist input {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+
+    /* ====== FOOTER ====== */
+    .footer {
+        text-align: center;
+        padding: 30px;
+        color: #7f8c8d;
+        font-size: 13px;
+        margin-left: 270px;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 900px) {
+        .sidebar {
+            position: relative;
+            width: 100%;
+            height: auto;
+            padding: 20px 15px;
+        }
+        .content { margin-left: 0; padding: 20px; }
+        .footer { margin-left: 0; }
+        .section { padding: 25px 20px; }
+        .header { padding: 25px; }
+        .header h1 { font-size: 22px; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ==================== SIDEBAR ==================== -->
+<nav class="sidebar">
+    <h2>📚 Daftar Materi</h2>
+    <a href="#step1"><span class="step-num">1</span>Pengenalan</a>
+    <a href="#step2"><span class="step-num">2</span>Install PostgreSQL</a>
+    <a href="#step3"><span class="step-num">3</span>Masuk psql</a>
+    <a href="#step4"><span class="step-num">4</span>Buat Database</a>
+    <a href="#step5"><span class="step-num">5</span>Buat Tabel</a>
+    <a href="#step6"><span class="step-num">6</span>CREATE</a>
+    <a href="#step7"><span class="step-num">7</span>READ</a>
+    <a href="#step8"><span class="step-num">8</span>UPDATE</a>
+    <a href="#step9"><span class="step-num">9</span>DELETE</a>
+    <a href="#step10"><span class="step-num">10</span>Latihan Gabungan</a>
+    <a href="#step11"><span class="step-num">11</span>Cheat Sheet</a>
+    <a href="#step12"><span class="step-num">12</span>SQL Injection</a>
+    <a href="#bonus"><span class="step-num">🔐</span>Bonus Keamanan</a>
+</nav>
+
+<!-- ==================== CONTENT ==================== -->
+<div class="content">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>🎓 Materi Belajar PostgreSQL CRUD</h1>
+        <p>Panduan step-by-step untuk pemula — dari nol sampai bisa</p>
+    </div>
+
+    <!-- ============ STEP 1 ============ -->
+    <section class="section" id="step1">
+        <h2><span class="badge">STEP 1</span> Pengenalan Database</h2>
+
+        <h3>Apa itu Database?</h3>
+        <p><strong>Database</strong> adalah tempat menyimpan data secara terstruktur. Bayangkan seperti <strong>lemari arsip</strong>:</p>
+        <ul>
+            <li><strong>Database</strong> = lemari</li>
+            <li><strong>Tabel</strong> = laci</li>
+            <li><strong>Baris (row)</strong> = satu lembar data</li>
+            <li><strong>Kolom (column)</strong> = isian di lembar</li>
+        </ul>
+
+        <h3>Apa itu CRUD?</h3>
+        <p>4 operasi dasar di database:</p>
+        <table>
+            <tr><th>Huruf</th><th>Arti</th><th>Perintah SQL</th></tr>
+            <tr><td><strong>C</strong></td><td>Create (buat)</td><td><code>INSERT</code></td></tr>
+            <tr><td><strong>R</strong></td><td>Read (baca)</td><td><code>SELECT</code></td></tr>
+            <tr><td><strong>U</strong></td><td>Update (ubah)</td><td><code>UPDATE</code></td></tr>
+            <tr><td><strong>D</strong></td><td>Delete (hapus)</td><td><code>DELETE</code></td></tr>
+        </table>
+
+        <div class="box box-info">
+            <strong>💡 Info</strong>
+            Semua aplikasi (Instagram, WhatsApp, Tokopedia) pakai 4 operasi ini di balik layar.
+        </div>
+    </section>
+
+    <!-- ============ STEP 2 ============ -->
+    <section class="section" id="step2">
+        <h2><span class="badge">STEP 2</span> Install PostgreSQL</h2>
+
+        <h3>Windows</h3>
+        <ol>
+            <li>Download dari <strong>postgresql.org/download/windows</strong></li>
+            <li>Jalankan installer → Next sampai selesai</li>
+            <li><strong>Password superuser</strong>: ketik <code>postgres</code> (atau apa saja, INGAT!)</li>
+            <li>Port: biarkan default <code>5432</code></li>
+            <li>Buka <strong>SQL Shell (psql)</strong> dari Start Menu</li>
+        </ol>
+
+        <h3>Linux (Ubuntu/Debian)</h3>
+        <div class="code"><span class="cmt"># Install PostgreSQL</span>
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo -u postgres psql</div>
+
+        <h3>Mac</h3>
+        <div class="code">brew install postgresql
+brew services start postgresql
+psql postgres</div>
+
+        <h3>Cek Berhasil</h3>
+        <p>Kalau muncul prompt seperti ini, berarti berhasil:</p>
+        <div class="code"><span class="prompt">postgres=#</span></div>
+
+        <div class="box box-warning">
+            <strong>⚠️ Tips</strong>
+            Kalau stuck, tekan <code>Ctrl + D</code> atau ketik <code>\q</code> lalu Enter untuk keluar.
+        </div>
+    </section>
+
+    <!-- ============ STEP 3 ============ -->
+    <section class="section" id="step3">
+        <h2><span class="badge">STEP 3</span> Masuk ke psql</h2>
+
+        <p><strong>psql</strong> = program untuk berkomunikasi dengan PostgreSQL lewat terminal.</p>
+
+        <h3>Perintah Navigasi Dasar</h3>
+        <div class="code"><span class="kw">\l</span>      <span class="cmt">-- lihat daftar database</span>
+<span class="kw">\?</span>      <span class="cmt">-- bantuan</span>
+<span class="kw">\q</span>      <span class="cmt">-- keluar dari psql</span></div>
+
+        <div class="box box-info">
+            <strong>💡 Aturan Penting</strong>
+            <ul>
+                <li>Perintah diawali <code>\</code> = perintah <strong>psql</strong></li>
+                <li>Perintah biasa = <strong>SQL</strong>, harus diakhiri <code>;</code></li>
+            </ul>
+        </div>
+
+        <h3>Perhatikan Prompt</h3>
+        <table>
+            <tr><th>Prompt</th><th>Arti</th></tr>
+            <tr><td><code>sekolah=#</code></td><td>Siap terima perintah baru ✅</td></tr>
+            <tr><td><code>sekolah-#</code></td><td>Masih menunggu (belum selesai) ⚠️</td></tr>
+            <tr><td><code>sekolah(#</code></td><td>Di dalam tanda kurung</td></tr>
+            <tr><td><code>sekolah'#</code></td><td>Di dalam tanda kutip</td></tr>
+        </table>
+
+        <div class="box box-danger">
+            <strong>🚨 Kalau prompt-nya <code>-#</code></strong>
+            Berarti ada perintah yang belum diakhiri <code>;</code>. Ketik <code>;</code> atau tekan <code>Ctrl + C</code> untuk membatalkan.
+        </div>
+
+        <h3>Kesalahan Umum MySQL vs PostgreSQL</h3>
+        <table>
+            <tr><th>Yang biasa diketik</th><th>Salah</th><th>Yang benar</th></tr>
+            <tr><td><code>describe siswa;</code></td><td>❌</td><td><code>\d siswa</code></td></tr>
+            <tr><td><code>show tables;</code></td><td>❌</td><td><code>\dt</code></td></tr>
+            <tr><td><code>show databases;</code></td><td>❌</td><td><code>\l</code></td></tr>
+            <tr><td><code>use sekolah;</code></td><td>❌</td><td><code>\c sekolah</code></td></tr>
+            <tr><td><code>exit;</code></td><td>❌</td><td><code>\q</code></td></tr>
+        </table>
+    </section>
+
+    <!-- ============ STEP 4 ============ -->
+    <section class="section" id="step4">
+        <h2><span class="badge">STEP 4</span> Membuat Database</h2>
+
+        <h3>Buat Database Baru</h3>
+        <div class="code"><span class="kw">CREATE DATABASE</span> sekolah;</div>
+
+        <p><strong>Penjelasan:</strong></p>
+        <ul>
+            <li><code>CREATE DATABASE</code> = perintah buat database</li>
+            <li><code>sekolah</code> = nama database</li>
+            <li><code>;</code> = wajib! Menandakan akhir perintah</li>
+        </ul>
+
+        <h3>Masuk ke Database</h3>
+        <div class="code"><span class="kw">\c</span> sekolah</div>
+        <p>Akan muncul: <code>You are now connected to database "sekolah"</code></p>
+
+        <h3>Cek Sedang di Database Mana</h3>
+        <div class="code"><span class="kw">SELECT</span> current_database();</div>
+
+        <h3>Hapus Database (Kalau Salah)</h3>
+        <div class="code"><span class="kw">DROP DATABASE</span> sekolah;</div>
+
+        <h3>✅ Latihan</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> Buat database <code>latihan_crud</code></label>
+            <label><input type="checkbox"> Masuk ke database itu</label>
+            <label><input type="checkbox"> Cek dengan <code>SELECT current_database();</code></label>
+            <label><input type="checkbox"> Keluar dengan <code>\q</code>, masuk lagi, ulangi</label>
+        </div>
+    </section>
+
+    <!-- ============ STEP 5 ============ -->
+    <section class="section" id="step5">
+        <h2><span class="badge">STEP 5</span> Membuat Tabel</h2>
+
+        <p><strong>Tabel</strong> = tempat menyimpan data. Seperti sheet di Excel, tapi lebih terstruktur.</p>
+
+        <h3>Bikin Tabel <code>siswa</code></h3>
+        <div class="code"><span class="kw">CREATE TABLE</span> siswa (
+    id <span class="kw">SERIAL PRIMARY KEY</span>,
+    nama <span class="kw">VARCHAR</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+    kelas <span class="kw">VARCHAR</span>(<span class="num">20</span>),
+    umur <span class="kw">INT</span>,
+    jurusan <span class="kw">VARCHAR</span>(<span class="num">50</span>)
+);</div>
+
+        <h3>Tipe Data Penting</h3>
+        <table>
+            <tr><th>Tipe</th><th>Arti</th><th>Contoh</th></tr>
+            <tr><td><code>SERIAL</code></td><td>Angka otomatis naik</td><td>1, 2, 3, 4...</td></tr>
+            <tr><td><code>INT</code></td><td>Angka bulat</td><td>15, 100, -5</td></tr>
+            <tr><td><code>VARCHAR(n)</code></td><td>Teks maksimal n huruf</td><td>'Budi'</td></tr>
+            <tr><td><code>TEXT</code></td><td>Teks bebas</td><td>Artikel panjang</td></tr>
+            <tr><td><code>BOOLEAN</code></td><td>True/False</td><td>TRUE, FALSE</td></tr>
+            <tr><td><code>DATE</code></td><td>Tanggal</td><td>'2024-01-15'</td></tr>
+            <tr><td><code>TIMESTAMP</code></td><td>Tanggal + waktu</td><td>'2024-01-15 10:30'</td></tr>
+        </table>
+
+        <h3>Constraint (Aturan)</h3>
+        <table>
+            <tr><th>Constraint</th><th>Arti</th></tr>
+            <tr><td><code>PRIMARY KEY</code></td><td>Identitas unik setiap baris</td></tr>
+            <tr><td><code>NOT NULL</code></td><td>Wajib diisi</td></tr>
+            <tr><td><code>UNIQUE</code></td><td>Tidak boleh sama</td></tr>
+            <tr><td><code>DEFAULT nilai</code></td><td>Nilai bawaan</td></tr>
+            <tr><td><code>CHECK (kondisi)</code></td><td>Validasi khusus</td></tr>
+        </table>
+
+        <h3>Cek Tabel</h3>
+        <div class="code"><span class="kw">\dt</span>          <span class="cmt">-- lihat daftar tabel</span>
+<span class="kw">\d</span> siswa    <span class="cmt">-- lihat struktur tabel siswa</span></div>
+
+        <div class="box box-danger">
+            <strong>🚨 Error Umum: <code>id</code> tidak ada tipe</strong>
+            <div class="code" style="margin-top:8px;"><span class="err">❌ SALAH:</span> create table siswa (id, nama varchar(5));
+<span class="ok">✅ BENAR:</span> create table siswa (id SERIAL PRIMARY KEY, nama VARCHAR(5));</div>
+        </div>
+
+        <h3>✅ Latihan</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> Buat tabel <code>siswa</code></label>
+            <label><input type="checkbox"> Cek dengan <code>\dt</code> dan <code>\d siswa</code></label>
+            <label><input type="checkbox"> Hapus tabel: <code>DROP TABLE siswa;</code></label>
+            <label><input type="checkbox"> Buat lagi dari awal (biar hafal)</label>
+        </div>
+    </section>
+
+    <!-- ============ STEP 6 ============ -->
+    <section class="section" id="step6">
+        <h2><span class="badge">STEP 6</span> CREATE — Menambah Data</h2>
+
+        <h3>Tambah 1 Data</h3>
+        <div class="code"><span class="kw">INSERT INTO</span> siswa (nama, kelas, umur, jurusan)
+<span class="kw">VALUES</span> (<span class="str">'Budi Santoso'</span>, <span class="str">'X-IPA-1'</span>, <span class="num">15</span>, <span class="str">'Teknik Informatika'</span>);</div>
+
+        <p><strong>Struktur:</strong></p>
+        <div class="code"><span class="kw">INSERT INTO</span> [nama_tabel] ([kolom1], [kolom2], ...)
+<span class="kw">VALUES</span> ([nilai1], [nilai2], ...);</div>
+
+        <div class="box box-warning">
+            <strong>⚠️ Aturan</strong>
+            <ul>
+                <li>Teks pakai tanda kutip <strong>'</strong> (petik satu)</li>
+                <li>Angka tidak pakai kutip</li>
+                <li>Kolom <code>id</code> tidak diisi (otomatis dari SERIAL)</li>
+            </ul>
+        </div>
+
+        <h3>Tambah Banyak Sekaligus</h3>
+        <div class="code"><span class="kw">INSERT INTO</span> siswa (nama, kelas, umur, jurusan) <span class="kw">VALUES</span>
+(<span class="str">'Ani Wijaya'</span>, <span class="str">'X-IPA-2'</span>, <span class="num">16</span>, <span class="str">'Sistem Informasi'</span>),
+(<span class="str">'Citra Dewi'</span>, <span class="str">'XI-IPA-1'</span>, <span class="num">17</span>, <span class="str">'Teknik Komputer'</span>),
+(<span class="str">'Dodi Pratama'</span>, <span class="str">'X-IPA-1'</span>, <span class="num">15</span>, <span class="str">'Teknik Informatika'</span>),
+(<span class="str">'Eka Putri'</span>, <span class="str">'XII-IPS-3'</span>, <span class="num">18</span>, <span class="str">'Manajemen'</span>);</div>
+
+        <h3>Cek Data Masuk</h3>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa;</div>
+
+        <h3>✅ Latihan</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> Tambah 1 siswa baru (data karanganmu)</label>
+            <label><input type="checkbox"> Tambah 3 siswa sekaligus</label>
+            <label><input type="checkbox"> Cek dengan <code>SELECT * FROM siswa;</code></label>
+        </div>
+    </section>
+
+    <!-- ============ STEP 7 ============ -->
+    <section class="section" id="step7">
+        <h2><span class="badge">STEP 7</span> READ — Membaca Data</h2>
+
+        <h3>Tampilkan Semua</h3>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa;</div>
+        <p>Tanda <code>*</code> = semua kolom.</p>
+
+        <h3>Tampilkan Kolom Tertentu</h3>
+        <div class="code"><span class="kw">SELECT</span> nama, kelas <span class="kw">FROM</span> siswa;</div>
+
+        <h3>Filter dengan WHERE</h3>
+        <div class="code"><span class="cmt">-- Siswa kelas X-IPA-1 saja</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> kelas = <span class="str">'X-IPA-1'</span>;
+
+<span class="cmt">-- Siswa umur lebih dari 15</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> umur &gt; <span class="num">15</span>;
+
+<span class="cmt">-- Kombinasi (AND)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa
+<span class="kw">WHERE</span> kelas = <span class="str">'X-IPA-1'</span> <span class="kw">AND</span> umur = <span class="num">15</span>;
+
+<span class="cmt">-- Kombinasi (OR)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa
+<span class="kw">WHERE</span> kelas = <span class="str">'X-IPA-1'</span> <span class="kw">OR</span> kelas = <span class="str">'X-IPA-2'</span>;</div>
+
+        <h3>Operator Perbandingan</h3>
+        <table>
+            <tr><th>Operator</th><th>Arti</th></tr>
+            <tr><td><code>=</code></td><td>Sama dengan</td></tr>
+            <tr><td><code>!=</code> atau <code>&lt;&gt;</code></td><td>Tidak sama</td></tr>
+            <tr><td><code>&gt;</code></td><td>Lebih besar</td></tr>
+            <tr><td><code>&lt;</code></td><td>Lebih kecil</td></tr>
+            <tr><td><code>&gt;=</code></td><td>Lebih besar sama dengan</td></tr>
+            <tr><td><code>&lt;=</code></td><td>Lebih kecil sama dengan</td></tr>
+        </table>
+
+        <h3>Urutkan (ORDER BY)</h3>
+        <div class="code"><span class="cmt">-- Urut nama A-Z</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">ORDER BY</span> nama <span class="kw">ASC</span>;
+
+<span class="cmt">-- Urut umur besar ke kecil</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">ORDER BY</span> umur <span class="kw">DESC</span>;</div>
+
+        <h3>Batasi Hasil (LIMIT)</h3>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">LIMIT</span> <span class="num">2</span>;</div>
+
+        <h3>Cari yang Mirip (LIKE)</h3>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> nama <span class="kw">LIKE</span> <span class="str">'A%'</span>;     <span class="cmt">-- diawali A</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> nama <span class="kw">LIKE</span> <span class="str">'%i'</span>;     <span class="cmt">-- diakhiri i</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> nama <span class="kw">LIKE</span> <span class="str">'%wi%'</span>;   <span class="cmt">-- mengandung 'wi'</span></div>
+        <p><code>%</code> artinya "apa saja".</p>
+
+        <h3>Hitung Jumlah Data</h3>
+        <div class="code"><span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> siswa;</div>
+
+        <h3>✅ Latihan</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> Tampilkan semua siswa kelas <code>X-IPA-1</code></label>
+            <label><input type="checkbox"> Tampilkan nama &amp; umur siswa umur &gt; 15, urut ASC</label>
+            <label><input type="checkbox"> Hitung siswa kelas <code>XI-IPA-1</code></label>
+            <label><input type="checkbox"> Cari siswa namanya diawali 'C'</label>
+            <label><input type="checkbox"> Tampilkan 2 siswa termuda</label>
+        </div>
+    </section>
+
+    <!-- ============ STEP 8 ============ -->
+    <section class="section" id="step8">
+        <h2><span class="badge">STEP 8</span> UPDATE — Mengubah Data</h2>
+
+        <h3>Struktur Dasar</h3>
+        <div class="code"><span class="kw">UPDATE</span> [tabel]
+<span class="kw">SET</span> [kolom] = [nilai baru]
+<span class="kw">WHERE</span> [kondisi];</div>
+
+        <h3>Ubah 1 Kolom</h3>
+        <div class="code"><span class="kw">UPDATE</span> siswa
+<span class="kw">SET</span> umur = <span class="num">16</span>
+<span class="kw">WHERE</span> nama = <span class="str">'Budi Santoso'</span>;</div>
+
+        <h3>Ubah Beberapa Kolom</h3>
+        <div class="code"><span class="kw">UPDATE</span> siswa
+<span class="kw">SET</span> kelas = <span class="str">'XI-IPA-1'</span>, umur = <span class="num">16</span>
+<span class="kw">WHERE</span> id = <span class="num">1</span>;</div>
+
+        <div class="box box-danger">
+            <strong>🚨 ATURAN EMAS — JANGAN LUPA WHERE!</strong>
+            <div class="code" style="margin-top:8px;"><span class="err">❌ BAHAYA! Semua umur jadi 99!</span>
+UPDATE siswa SET umur = 99;</div>
+        </div>
+
+        <h3>Kebiasaan Aman</h3>
+        <div class="code"><span class="cmt">-- 1. Cek dulu dengan SELECT</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> nama = <span class="str">'Budi Santoso'</span>;
+
+<span class="cmt">-- 2. Baru UPDATE</span>
+<span class="kw">UPDATE</span> siswa <span class="kw">SET</span> umur = <span class="num">16</span> <span class="kw">WHERE</span> nama = <span class="str">'Budi Santoso'</span>;
+
+<span class="cmt">-- 3. Cek hasil</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> nama = <span class="str">'Budi Santoso'</span>;</div>
+
+        <h3>✅ Latihan</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> Ubah kelas 'Ani Wijaya' jadi <code>XI-IPA-2</code></label>
+            <label><input type="checkbox"> Ubah umur semua siswa <code>X-IPA-1</code> jadi 16</label>
+            <label><input type="checkbox"> Ubah jurusan siswa ID 3 jadi 'Teknik Elektro'</label>
+            <label><input type="checkbox"> Cek hasil tiap perubahan dengan SELECT</label>
+        </div>
+    </section>
+
+    <!-- ============ STEP 9 ============ -->
+    <section class="section" id="step9">
+        <h2><span class="badge">STEP 9</span> DELETE — Menghapus Data</h2>
+
+        <h3>Struktur Dasar</h3>
+        <div class="code"><span class="kw">DELETE FROM</span> [tabel]
+<span class="kw">WHERE</span> [kondisi];</div>
+
+        <h3>Hapus 1 Data</h3>
+        <div class="code"><span class="kw">DELETE FROM</span> siswa <span class="kw">WHERE</span> id = <span class="num">4</span>;</div>
+
+        <h3>Hapus dengan Kondisi</h3>
+        <div class="code"><span class="cmt">-- Hapus siswa umur kurang dari 15</span>
+<span class="kw">DELETE FROM</span> siswa <span class="kw">WHERE</span> umur &lt; <span class="num">15</span>;
+
+<span class="cmt">-- Hapus siswa kelas XII</span>
+<span class="kw">DELETE FROM</span> siswa <span class="kw">WHERE</span> kelas <span class="kw">LIKE</span> <span class="str">'XII%'</span>;</div>
+
+        <div class="box box-danger">
+            <strong>🚨 ATURAN EMAS — JANGAN LUPA WHERE!</strong>
+            <div class="code" style="margin-top:8px;"><span class="err">❌ BAHAYA! SEMUA DATA HILANG!</span>
+DELETE FROM siswa;</div>
+        </div>
+
+        <h3>Kosongkan Tabel (Tapi Tabel Tetap Ada)</h3>
+        <div class="code"><span class="kw">TRUNCATE TABLE</span> siswa;</div>
+
+        <p><strong>Bedanya dengan DELETE:</strong></p>
+        <ul>
+            <li><code>DELETE</code> → hapus baris satu-satu, bisa rollback</li>
+            <li><code>TRUNCATE</code> → hapus semua sekaligus, lebih cepat, tidak bisa rollback</li>
+        </ul>
+
+        <h3>Hapus Tabel Sekalian</h3>
+        <div class="code"><span class="kw">DROP TABLE</span> siswa;</div>
+
+        <h3>✅ Latihan</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> Cek data dulu: <code>SELECT * FROM siswa;</code></label>
+            <label><input type="checkbox"> Hapus 1 siswa dengan ID tertentu</label>
+            <label><input type="checkbox"> Hapus siswa yang umurnya &gt; 17</label>
+            <label><input type="checkbox"> Cek hasil</label>
+            <label><input type="checkbox"> Jangan <code>TRUNCATE</code> dulu — nanti di latihan akhir</label>
+        </div>
+    </section>
+
+    <!-- ============ STEP 10 ============ -->
+    <section class="section" id="step10">
+        <h2><span class="badge">STEP 10</span> Latihan Gabungan</h2>
+
+        <h3>📚 Skenario: Sistem Data Buku Perpustakaan</h3>
+        <p>Buka psql, jalankan urut dari atas:</p>
+
+        <div class="code"><span class="cmt">-- 1. Buat database</span>
+<span class="kw">CREATE DATABASE</span> perpustakaan;
+<span class="kw">\c</span> perpustakaan
+
+<span class="cmt">-- 2. Buat tabel</span>
+<span class="kw">CREATE TABLE</span> buku (
+    id <span class="kw">SERIAL PRIMARY KEY</span>,
+    judul <span class="kw">VARCHAR</span>(<span class="num">150</span>) <span class="kw">NOT NULL</span>,
+    penulis <span class="kw">VARCHAR</span>(<span class="num">100</span>),
+    tahun <span class="kw">INT</span>,
+    stok <span class="kw">INT DEFAULT</span> <span class="num">0</span>
+);
+
+<span class="cmt">-- 3. Insert data</span>
+<span class="kw">INSERT INTO</span> buku (judul, penulis, tahun, stok) <span class="kw">VALUES</span>
+(<span class="str">'Laskar Pelangi'</span>, <span class="str">'Andrea Hirata'</span>, <span class="num">2005</span>, <span class="num">5</span>),
+(<span class="str">'Bumi Manusia'</span>, <span class="str">'Pramoedya Ananta Toer'</span>, <span class="num">1980</span>, <span class="num">3</span>),
+(<span class="str">'Negeri 5 Menara'</span>, <span class="str">'Ahmad Fuadi'</span>, <span class="num">2009</span>, <span class="num">4</span>),
+(<span class="str">'Atomic Habits'</span>, <span class="str">'James Clear'</span>, <span class="num">2018</span>, <span class="num">7</span>),
+(<span class="str">'Filosofi Teras'</span>, <span class="str">'Henry Manampiring'</span>, <span class="num">2018</span>, <span class="num">6</span>);
+
+<span class="cmt">-- 4. READ — semua buku</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> buku;
+
+<span class="cmt">-- 5. READ — buku tahun 2000 ke atas</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> buku <span class="kw">WHERE</span> tahun &gt;= <span class="num">2000</span>;
+
+<span class="cmt">-- 6. READ — urut stok terbanyak</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> buku <span class="kw">ORDER BY</span> stok <span class="kw">DESC</span>;
+
+<span class="cmt">-- 7. UPDATE — tambah stok Laskar Pelangi</span>
+<span class="kw">UPDATE</span> buku <span class="kw">SET</span> stok = <span class="num">10</span> <span class="kw">WHERE</span> judul = <span class="str">'Laskar Pelangi'</span>;
+
+<span class="cmt">-- 8. DELETE — hapus buku yang stoknya 0</span>
+<span class="kw">DELETE FROM</span> buku <span class="kw">WHERE</span> stok = <span class="num">0</span>;
+
+<span class="cmt">-- 9. Cek hasil akhir</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> buku;</div>
+
+        <h3>📝 Tugas Akhir</h3>
+        <p>Bikin sendiri dari awal:</p>
+        <ol>
+            <li>Database <code>tokoku</code></li>
+            <li>Tabel <code>produk</code> dengan kolom: id, nama, harga, stok, kategori</li>
+            <li>Isi 5 produk</li>
+            <li>Tampilkan produk dengan harga &gt; 50000</li>
+            <li>Update stok salah satu produk</li>
+            <li>Hapus 1 produk</li>
+            <li>Tampilkan semua produk urut harga DESC</li>
+        </ol>
+    </section>
+
+    <!-- ============ STEP 11 ============ -->
+    <section class="section" id="step11">
+        <h2><span class="badge">STEP 11</span> Cheat Sheet</h2>
+
+        <h3>Perintah psql</h3>
+        <div class="code"><span class="kw">\l</span>              <span class="cmt">-- list database</span>
+<span class="kw">\c</span> nama_db      <span class="cmt">-- pindah database</span>
+<span class="kw">\dt</span>             <span class="cmt">-- list tabel</span>
+<span class="kw">\d</span> nama_tabel   <span class="cmt">-- struktur tabel</span>
+<span class="kw">\d+</span> nama_tabel  <span class="cmt">-- struktur detail</span>
+<span class="kw">\q</span>              <span class="cmt">-- keluar</span>
+<span class="kw">\?</span>              <span class="cmt">-- bantuan</span></div>
+
+        <h3>SQL Dasar</h3>
+        <div class="code"><span class="cmt">-- CREATE DATABASE</span>
+<span class="kw">CREATE DATABASE</span> nama_db;
+<span class="kw">DROP DATABASE</span> nama_db;
+
+<span class="cmt">-- CREATE TABLE</span>
+<span class="kw">CREATE TABLE</span> nama_tabel (
+    id <span class="kw">SERIAL PRIMARY KEY</span>,
+    kolom1 <span class="kw">VARCHAR</span>(<span class="num">50</span>),
+    kolom2 <span class="kw">INT</span>
+);
+<span class="kw">DROP TABLE</span> nama_tabel;
+
+<span class="cmt">-- CREATE (INSERT)</span>
+<span class="kw">INSERT INTO</span> tabel (kolom1, kolom2) <span class="kw">VALUES</span> (<span class="str">'a'</span>, <span class="num">1</span>);
+<span class="kw">INSERT INTO</span> tabel (kolom1, kolom2) <span class="kw">VALUES</span> (<span class="str">'a'</span>, <span class="num">1</span>), (<span class="str">'b'</span>, <span class="num">2</span>);
+
+<span class="cmt">-- READ (SELECT)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> tabel;
+<span class="kw">SELECT</span> kolom1, kolom2 <span class="kw">FROM</span> tabel;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> tabel <span class="kw">WHERE</span> kondisi;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> tabel <span class="kw">ORDER BY</span> kolom <span class="kw">ASC</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> tabel <span class="kw">LIMIT</span> <span class="num">5</span>;
+<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> tabel;
+
+<span class="cmt">-- UPDATE</span>
+<span class="kw">UPDATE</span> tabel <span class="kw">SET</span> kolom = <span class="str">'nilai'</span> <span class="kw">WHERE</span> kondisi;
+
+<span class="cmt">-- DELETE</span>
+<span class="kw">DELETE FROM</span> tabel <span class="kw">WHERE</span> kondisi;
+<span class="kw">TRUNCATE TABLE</span> tabel;</div>
+    </section>
+
+    <!-- ============ STEP 12 ============ -->
+    <section class="section" id="step12">
+        <h2><span class="badge">STEP 12</span> SQL Injection — Studi Kasus Login Bypass</h2>
+
+        <p>Setelah paham CRUD, kamu <strong>wajib</strong> paham ini. Ini serangan paling klasik dan paling berbahaya di dunia web.</p>
+
+        <div class="box box-danger">
+            <strong>⚠️ Peringatan</strong>
+            Materi ini untuk <strong>pembelajaran</strong>. Uji SQL Injection hanya di lab milik sendiri atau platform resmi (HackTheBox, TryHackMe, DVWA). Menguji website orang lain tanpa izin = <strong>pidana</strong>.
+        </div>
+
+        <h3>1. Skenario Awal — Aplikasi Login Rentan</h3>
+        <p>Bayangkan ada aplikasi login. Di balik layar, kodenya seperti ini (❌ <strong>RENTAN</strong>):</p>
+
+        <div class="code"><span class="cmt"># Kode Python rentan</span>
+username = input(<span class="str">"Username: "</span>)
+password = input(<span class="str">"Password: "</span>)
+
+query = <span class="str">"SELECT * FROM user WHERE nama = '"</span> + username + <span class="str">"' AND password = '"</span> + password + <span class="str">"'"</span>
+cursor.execute(query)</div>
+
+        <div class="box box-warning">
+            <strong>⚠️ Masalahnya</strong>
+            String <code>username</code> dan <code>password</code> digabung <strong>langsung</strong> ke dalam query. Ini pintu masuk SQL Injection.
+        </div>
+
+        <h3>2. Kasus Normal — User Jujur Login</h3>
+        <p><strong>Input user:</strong></p>
+        <ul>
+            <li>Username: <code>budi</code></li>
+            <li>Password: <code>rahasia123</code></li>
+        </ul>
+
+        <p><strong>Query yang terbentuk:</strong></p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">'budi'</span> <span class="kw">AND</span> password = <span class="str">'rahasia123'</span></div>
+
+        <p>Database cek: ada user <code>budi</code> <strong>DAN</strong> password <code>rahasia123</code>? Ya → login berhasil. ✅</p>
+
+        <h3>3. Kasus Penyerang — Input <code>admin'--</code></h3>
+        <p><strong>Input penyerang:</strong></p>
+        <ul>
+            <li>Username: <code>admin'--</code></li>
+            <li>Password: <code>apa_saja</code> (bisa kosong)</li>
+        </ul>
+
+        <p><strong>Query yang terbentuk:</strong></p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">'admin'</span><span class="err">--</span><span class="str">' AND password = 'apa_saja'</span></div>
+
+        <p>Lihat bagian yang ditandai merah? Itu kuncinya.</p>
+
+        <h3>4. Kunci Serangan: <code>--</code> adalah Komentar</h3>
+        <p>Di SQL, <code>--</code> artinya <strong>komentar</strong>. Apa pun setelahnya <strong>diabaikan</strong> oleh database.</p>
+
+        <div class="code"><span class="cmt">-- Contoh komentar</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">'admin'</span><span class="err">-- ini diabaikan</span></div>
+
+        <h3>5. Query yang Benar-Benar Dijalankan</h3>
+        <p><strong>Query asli:</strong></p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">'admin'</span><span class="err">--' AND password = 'apa_saja'</span></div>
+
+        <p>Database memotong di <code>--</code>:</p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">'admin'</span></div>
+
+        <div class="box box-danger">
+            <strong>💀 Bagian <code>AND password = '...'</code> HILANG!</strong>
+            Password <strong>tidak dicek sama sekali</strong>. Cukup user <code>admin</code> ada di database → login berhasil.
+        </div>
+
+        <h3>6. Ilustrasi Visual</h3>
+        <div class="code"><span class="cmt">Query asli yang dibuat aplikasi:</span>
+┌─────────────────────────────────────────────────────┐
+│ <span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">'admin'</span><span class="err">--</span><span class="str">' AND password</span> │
+└─────────────────────────────────────────────────────┘
+                            ↓
+                <span class="err">Database potong di sini (--)</span>
+
+<span class="cmt">Query yang benar-benar dijalankan:</span>
+┌──────────────────────────────────┐
+│ <span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = │
+│ <span class="str">'admin'</span>                          │
+└──────────────────────────────────┘
+        ↓
+   Return baris admin
+        ↓
+   <span class="err">Login BERHASIL 🚨</span></div>
+
+        <h3>7. Variasi Payload SQL Injection</h3>
+        <p>Penyerang tidak cuma pakai <code>admin'--</code>. Banyak variasi:</p>
+
+        <table>
+            <tr><th>Payload</th><th>Efek</th><th>Database</th></tr>
+            <tr><td><code>admin'--</code></td><td>Potong sisa query</td><td>Semua</td></tr>
+            <tr><td><code>admin'#</code></td><td>Komentar ala MySQL</td><td>MySQL</td></tr>
+            <tr><td><code>admin'/*</code></td><td>Komentar block</td><td>Semua</td></tr>
+            <tr><td><code>' OR '1'='1</code></td><td>Selalu TRUE</td><td>Semua</td></tr>
+            <tr><td><code>' OR 1=1--</code></td><td>Selalu TRUE + potong</td><td>Semua</td></tr>
+            <tr><td><code>budi'--</code></td><td>Login sebagai budi</td><td>Semua</td></tr>
+        </table>
+
+        <h3>8. Contoh Payload <code>' OR 1=1--</code></h3>
+        <p><strong>Input:</strong></p>
+        <ul>
+            <li>Username: <code>' OR 1=1--</code></li>
+            <li>Password: (kosong)</li>
+        </ul>
+
+        <p><strong>Query yang terbentuk:</strong></p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">''</span> <span class="kw">OR</span> <span class="num">1</span>=<span class="num">1</span><span class="err">--' AND password = ''</span></div>
+
+        <p>Setelah dipotong:</p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">''</span> <span class="kw">OR</span> <span class="num">1</span>=<span class="num">1</span></div>
+
+        <p><code>1=1</code> selalu <strong>TRUE</strong> → semua baris dikembalikan → login sebagai user pertama (biasanya admin). 🚨</p>
+
+        <h3>9. Simulasi di PostgreSQL (Lab)</h3>
+        <p>Coba sendiri di psql:</p>
+
+        <div class="code"><span class="cmt">-- 1. Bikin tabel user</span>
+<span class="kw">CREATE TABLE</span> user_login (
+    id <span class="kw">SERIAL PRIMARY KEY</span>,
+    nama <span class="kw">VARCHAR</span>(<span class="num">50</span>),
+    password <span class="kw">VARCHAR</span>(<span class="num">50</span>)
+);
+
+<span class="cmt">-- 2. Isi data</span>
+<span class="kw">INSERT INTO</span> user_login (nama, password) <span class="kw">VALUES</span>
+(<span class="str">'admin'</span>, <span class="str">'admin123'</span>),
+(<span class="str">'budi'</span>, <span class="str">'rahasia456'</span>);
+
+<span class="cmt">-- 3. Query RENTAN dengan payload admin'--</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> user_login
+<span class="kw">WHERE</span> nama = <span class="str">'admin'</span><span class="err">--</span><span class="str">' AND password = 'apapun'</span>;</div>
+
+        <p><strong>Hasil:</strong></p>
+        <div class="code"> id | nama  | password
+----+-------+----------
+  1 | admin | admin123
+
+<span class="err">-- Password TIDAK dicek! Baris admin tetap keluar! 🚨</span></div>
+
+        <h3>10. Cara Mencegah — Parameterized Query</h3>
+
+        <p><strong>❌ Kode Rentan:</strong></p>
+        <div class="code">query = <span class="str">"SELECT * FROM user WHERE nama = '"</span> + username + <span class="str">"' AND password = '"</span> + password + <span class="str">"'"</span>
+cursor.execute(query)</div>
+
+        <p><strong>✅ Kode Aman:</strong></p>
+        <div class="code">query = <span class="str">"SELECT * FROM user WHERE nama = %s AND password = %s"</span>
+cursor.execute(query, (username, password))</div>
+
+        <div class="box box-success">
+            <strong>✅ Kenapa Aman?</strong>
+            <ul>
+                <li><code>%s</code> adalah <strong>placeholder</strong> — database yang mengisi, bukan kita</li>
+                <li>Input <code>admin'--</code> dianggap <strong>string biasa</strong>, bukan perintah</li>
+                <li>Query tidak bisa dipotong</li>
+                <li>Password <strong>tetap dicek</strong></li>
+            </ul>
+        </div>
+
+        <p>Query yang dijalankan database:</p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">'admin''--'</span> <span class="kw">AND</span> password = <span class="str">'apa_saja'</span></div>
+
+        <p>Perhatikan: <code>'</code> di-escape jadi <code>''</code>. Query <strong>tidak terpotong</strong>.</p>
+
+        <h3>11. Kenapa SQL Injection Berbahaya?</h3>
+        <table>
+            <tr><th>Bahaya</th><th>Penjelasan</th></tr>
+            <tr><td>Login tanpa password</td><td>Akses akun orang lain</td></tr>
+            <tr><td>Akses admin</td><td>Kalau ada user <code>admin</code>, bisa jadi admin</td></tr>
+            <tr><td>Data bocor</td><td>Setelah login, bisa lihat data sensitif</td></tr>
+            <tr><td>Rantai serangan</td><td>Lanjut ke UNION injection, dump database, dll</td></tr>
+            <tr><td>Hapus data</td><td>Payload <code>'; DROP TABLE user;--</code></td></tr>
+        </table>
+
+        <h3>12. Alur Serangan Lengkap</h3>
+        <div class="code"><span class="num">1.</span> Penyerang buka halaman login
+        ↓
+<span class="num">2.</span> Coba input <span class="str">'</span> (kutip satu) sebagai test
+        ↓
+<span class="num">3.</span> Kalau muncul error SQL → aplikasi <span class="err">RENTAN</span>
+        ↓
+<span class="num">4.</span> Input: <span class="str">admin'--</span>
+        ↓
+<span class="num">5.</span> Query jadi: <span class="kw">SELECT</span> * <span class="kw">FROM</span> user <span class="kw">WHERE</span> nama = <span class="str">'admin'</span>
+        ↓
+<span class="num">6.</span> Password tidak dicek
+        ↓
+<span class="num">7.</span> <span class="err">Login berhasil sebagai admin 🚨</span>
+        ↓
+<span class="num">8.</span> Akses panel admin, dump database, dll</div>
+
+        <h3>13. Checklist Anti SQL Injection</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> <strong>Jangan pernah</strong> gabung string jadi SQL</label>
+            <label><input type="checkbox"> Selalu pakai <strong>parameterized query</strong> (<code>%s</code>, <code>?</code>, <code>$1</code>)</label>
+            <label><input type="checkbox"> Pakai <strong>ORM</strong> (SQLAlchemy, Django ORM) yang otomatis aman</label>
+            <label><input type="checkbox"> Validasi input di <strong>server</strong>, bukan cuma di HTML</label>
+            <label><input type="checkbox"> Batasi hak akses user database (<strong>least privilege</strong>)</label>
+            <label><input type="checkbox"> Jangan tampilkan <strong>error SQL</strong> ke user</label>
+            <label><input type="checkbox"> Log semua aktivitas login (sukses &amp; gagal)</label>
+            <label><input type="checkbox"> Update PostgreSQL &amp; library secara rutin</label>
+        </div>
+
+        <h3>14. Payload Test Umum (untuk Lab)</h3>
+        <p>Kalau kamu punya lab sendiri, coba payload ini untuk uji keamanan:</p>
+        <div class="code"><span class="cmt">-- Test dasar (mengandung karakter SQL)</span>
+<span class="str">'</span>
+<span class="str">''</span>
+<span class="str">`</span>
+<span class="str">")</span>
+
+<span class="cmt">-- Bypass login</span>
+<span class="str">admin'--</span>
+<span class="str">' OR 1=1--</span>
+<span class="str">' OR '1'='1</span>
+<span class="str">admin'#</span>
+<span class="str">admin'/*</span>
+
+<span class="cmt">-- Union-based (kalau ada output)</span>
+<span class="str">' UNION SELECT NULL, username, password FROM user--</span>
+
+<span class="cmt">-- Time-based blind</span>
+<span class="str">' OR pg_sleep(5)--</span></div>
+
+        <h3>15. Tools untuk Belajar</h3>
+        <table>
+            <tr><th>Tool</th><th>Fungsi</th></tr>
+            <tr><td><strong>sqlmap</strong></td><td>Deteksi otomatis SQL injection</td></tr>
+            <tr><td><strong>Burp Suite</strong></td><td>Intercept &amp; modifikasi request</td></tr>
+            <tr><td><strong>DVWA</strong></td><td>Lab latihan lokal (Damn Vulnerable Web App)</td></tr>
+            <tr><td><strong>bWAPP</strong></td><td>Buggy Web App untuk latihan</td></tr>
+            <tr><td><strong>PortSwigger Academy</strong></td><td>Lab online gratis (interaktif)</td></tr>
+            <tr><td><strong>TryHackMe</strong></td><td>Room SQL Injection</td></tr>
+        </table>
+
+        <h3>16. Ringkasan</h3>
+        <table>
+            <tr><th>Pertanyaan</th><th>Jawaban</th></tr>
+            <tr><td>Apa itu <code>admin'--</code>?</td><td>Payload SQL injection untuk bypass login</td></tr>
+            <tr><td>Kenapa berhasil?</td><td><code>--</code> memotong query, cek password hilang</td></tr>
+            <tr><td>Efeknya?</td><td>Login tanpa tahu password</td></tr>
+            <tr><td>Cara cegah?</td><td>Parameterized query (<code>%s</code>)</td></tr>
+            <tr><td>Kalau sudah kena?</td><td>Audit semua query, ganti ke prepared statement</td></tr>
+        </table>
+
+        <div class="box box-danger">
+            <strong>🚨 Ingat!</strong>
+            SQL Injection hanya legal dilakukan di:
+            <ul>
+                <li>Lab milik sendiri</li>
+                <li>Platform resmi (HackTheBox, TryHackMe, DVWA)</li>
+                <li>Website dengan izin tertulis dari pemilik</li>
+            </ul>
+            Menguji website orang lain tanpa izin = <strong>pidana</strong> (UU ITE Indonesia).
+        </div>
+    </section>
+
+    <!-- ============ BONUS ============ -->
+    <section class="section" id="bonus">
+        <h2><span class="badge">🔐 BONUS</span> Keamanan untuk Siswa Cyber</h2>
+
+        <p>Setelah paham CRUD &amp; SQL Injection, kamu <strong>wajib</strong> tahu ini:</p>
+
+        <h3>1. Jangan Simpan Password Plaintext</h3>
+        <div class="code"><span class="err">-- ❌ SALAH</span>
+<span class="kw">INSERT INTO</span> user (nama, password) <span class="kw">VALUES</span> (<span class="str">'budi'</span>, <span class="str">'rahasia123'</span>);
+
+<span class="ok">-- ✅ BENAR (hash pakai bcrypt/argon2)</span>
+<span class="kw">INSERT INTO</span> user (nama, password_hash)
+<span class="kw">VALUES</span> (<span class="str">'budi'</span>, <span class="str">'$2b$12$...'</span>);</div>
+
+        <h3>2. Least Privilege</h3>
+        <p>Buat user database dengan hak terbatas:</p>
+        <div class="code"><span class="kw">CREATE USER</span> app_user <span class="kw">WITH PASSWORD</span> <span class="str">'StrongP@ss!'</span>;
+<span class="kw">GRANT SELECT, INSERT, UPDATE, DELETE</span>
+    <span class="kw">ON ALL TABLES IN SCHEMA</span> public <span class="kw">TO</span> app_user;
+<span class="cmt">-- JANGAN kasih SUPERUSER</span></div>
+
+        <h3>3. Selalu Pakai WHERE di UPDATE/DELETE</h3>
+        <p>Kesalahan paling sering → data massal hilang.</p>
+
+        <h3>4. Backup Rutin</h3>
+        <div class="code">pg_dump nama_db &gt; backup.sql</div>
+
+        <h3>5. Jangan Tampilkan Error SQL ke User</h3>
+        <div class="code"><span class="err">❌ SALAH:</span> "ERROR: syntax error at or near 'admin'--'"
+<span class="ok">✅ BENAR:</span> "Login gagal, silakan coba lagi."</div>
+
+        <h3>6. Log Aktivitas Login</h3>
+        <div class="code"><span class="kw">CREATE TABLE</span> login_log (
+    id <span class="kw">SERIAL PRIMARY KEY</span>,
+    username <span class="kw">VARCHAR</span>(<span class="num">50</span>),
+    status <span class="kw">VARCHAR</span>(<span class="num">10</span>),
+    ip_address <span class="kw">INET</span>,
+    waktu <span class="kw">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
+);</div>
+    </section>
+
+    <!-- ============ RENCANA 7 HARI ============ -->
+    <section class="section">
+        <h2><span class="badge">📅</span> Rencana Belajar 7 Hari</h2>
+
+        <table>
+            <tr><th>Hari</th><th>Materi</th><th>Target</th></tr>
+            <tr><td>1</td><td>Step 1-3</td><td>Install &amp; navigasi psql</td></tr>
+            <tr><td>2</td><td>Step 4-5</td><td>Bikin database &amp; tabel</td></tr>
+            <tr><td>3</td><td>Step 6</td><td>INSERT data (1 &amp; banyak)</td></tr>
+            <tr><td>4</td><td>Step 7</td><td>SELECT dengan filter &amp; urut</td></tr>
+            <tr><td>5</td><td>Step 8</td><td>UPDATE dengan aman</td></tr>
+            <tr><td>6</td><td>Step 9</td><td>DELETE dengan aman</td></tr>
+            <tr><td>7</td><td>Step 10-12</td><td>Latihan gabungan &amp; SQL Injection</td></tr>
+        </table>
+
+        <p><strong>Setelah 7 hari</strong>, lanjut ke:</p>
+        <ul>
+            <li>JOIN (gabung tabel)</li>
+            <li>GROUP BY (agregasi)</li>
+            <li>Foreign Key (relasi)</li>
+            <li>Python + PostgreSQL (aplikasi nyata)</li>
+        </ul>
+    </section>
+
+    <!-- ============ KESIMPULAN ============ -->
+    <section class="section">
+        <h2><span class="badge">✅</span> Kesimpulan</h2>
+
+        <p><strong>Alur belajar CRUD:</strong></p>
+        <div class="code">Database → Tabel → CREATE → READ → UPDATE → DELETE</div>
+
+        <p><strong>Aturan emas pemula:</strong></p>
+        <ol>
+            <li><strong>Jangan lupa <code>;</code></strong> di akhir SQL</li>
+            <li><strong>Jangan lupa WHERE</strong> di UPDATE/DELETE</li>
+            <li><strong>Cek dengan SELECT</strong> dulu sebelum ubah/hapus</li>
+            <li><strong>Latihan tiap hari</strong> — minimal 15 menit</li>
+            <li><strong>Jangan takut error</strong> — error itu guru terbaik</li>
+        </ol>
+
+        <div class="box box-success">
+            <strong>🎉 Selamat!</strong>
+            Kalau kamu sudah menyelesaikan semua step di atas, kamu sudah menguasai dasar CRUD PostgreSQL dan paham dasar SQL Injection.
+        </div>
+    </section>
+
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer">
+    <p>📚 Materi Belajar PostgreSQL CRUD — untuk Pemula</p>
+    <p>Dibuat untuk siswa cyber security • 2024</p>
+</div>
+
+<!-- ==================== SCRIPT SIDEBAR ==================== -->
+<script>
+    // ===== Klik sidebar → smooth scroll =====
+    var sidebarLinks = document.querySelectorAll('.sidebar a');
+    sidebarLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetId = this.getAttribute('href');
+            var target = document.querySelector(targetId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // ===== Highlight menu aktif saat scroll =====
+    function updateActiveMenu() {
+        var scrollPos = window.scrollY + 120;
+        var currentId = '';
+
+        document.querySelectorAll('.section').forEach(function(section) {
+            var top = section.offsetTop;
+            var bottom = top + section.offsetHeight;
+            if (scrollPos >= top && scrollPos < bottom) {
+                currentId = section.getAttribute('id');
+            }
+        });
+
+        if (currentId) {
+            sidebarLinks.forEach(function(l) {
+                l.classList.remove('active');
+                if (l.getAttribute('href') === '#' + currentId) {
+                    l.classList.add('active');
+                }
+            });
+        }
+    }
+
+    window.addEventListener('scroll', updateActiveMenu);
+    window.addEventListener('load', updateActiveMenu);
+
+    // ===== Simpan status checkbox ke localStorage =====
+    document.querySelectorAll('.checklist input[type="checkbox"]').forEach(function(cb, idx) {
+        var key = 'checklist_' + idx;
+        if (localStorage.getItem(key) === '1') {
+            cb.checked = true;
+        }
+        cb.addEventListener('change', function() {
+            localStorage.setItem(key, cb.checked ? '1' : '0');
+        });
+    });
+</script>
+
+</body>
+</html>
