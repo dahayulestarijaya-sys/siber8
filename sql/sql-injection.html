@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materi Lab SQL Injection — PHP + PostgreSQL</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f0f2f5;
+        color: #2c3e50;
+        line-height: 1.7;
+    }
+
+    /* ====== SIDEBAR ====== */
+    .sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        width: 280px;
+        height: 100vh;
+        background: #1e272e;
+        color: #ecf0f1;
+        padding: 25px 18px;
+        overflow-y: auto;
+        z-index: 100;
+    }
+    .sidebar h2 {
+        font-size: 14px;
+        color: #e74c3c;
+        margin-bottom: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        padding: 9px 12px;
+        color: #bdc3c7;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-bottom: 3px;
+        font-size: 13.5px;
+        transition: all 0.2s;
+    }
+    .sidebar a:hover {
+        background: #34495e;
+        color: #fff;
+        padding-left: 16px;
+    }
+    .sidebar a.active {
+        background: #e74c3c;
+        color: #fff;
+        font-weight: 600;
+    }
+    .sidebar .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        background: #e74c3c;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 11px;
+        font-weight: bold;
+        margin-right: 9px;
+    }
+    .sidebar a.active .step-num {
+        background: #fff;
+        color: #e74c3c;
+    }
+
+    /* ====== CONTENT ====== */
+    .content {
+        margin-left: 280px;
+        padding: 40px 50px;
+        max-width: 1000px;
+    }
+
+    /* ====== HEADER ====== */
+    .header {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: #fff;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+    }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .header p { opacity: 0.95; font-size: 15px; }
+    .header .warning {
+        background: rgba(255,255,255,0.15);
+        padding: 12px 18px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 13px;
+        border-left: 4px solid #fff;
+    }
+
+    /* ====== SECTION ====== */
+    .section {
+        background: #fff;
+        padding: 35px 40px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        scroll-margin-top: 20px;
+    }
+    .section h2 {
+        font-size: 22px;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #e74c3c;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .section h2 .badge {
+        background: #e74c3c;
+        color: #fff;
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .section h3 {
+        font-size: 17px;
+        color: #34495e;
+        margin: 25px 0 12px;
+    }
+    .section p { margin-bottom: 12px; }
+    .section ul, .section ol {
+        margin: 12px 0 12px 25px;
+    }
+    .section li { margin-bottom: 6px; }
+    .section code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        color: #c0392b;
+    }
+
+    /* ====== CODE BLOCK ====== */
+    .code {
+        background: #1e272e;
+        color: #ecf0f1;
+        padding: 18px 20px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: 13.5px;
+        margin: 15px 0;
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 1.6;
+        border-left: 4px solid #e74c3c;
+    }
+    .code .kw { color: #e74c3c; font-weight: bold; }
+    .code .str { color: #2ecc71; }
+    .code .num { color: #f39c12; }
+    .code .cmt { color: #7f8c8d; font-style: italic; }
+    .code .prompt { color: #3498db; font-weight: bold; }
+    .code .err { color: #e74c3c; }
+    .code .ok { color: #2ecc71; }
+    .code .var { color: #9b59b6; }
+    .code .func { color: #f39c12; }
+
+    /* ====== BOX ====== */
+    .box {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-size: 14px;
+        border-left: 5px solid;
+    }
+    .box-info    { background: #e8f4fd; border-color: #3498db; }
+    .box-warning { background: #fff3cd; border-color: #f39c12; }
+    .box-danger  { background: #f8d7da; border-color: #e74c3c; }
+    .box-success { background: #d4edda; border-color: #27ae60; }
+    .box strong { display: block; margin-bottom: 5px; }
+    .box ul { margin: 8px 0 0 20px; }
+    .box li { margin-bottom: 4px; }
+
+    /* ====== TABLE ====== */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+        font-size: 14px;
+    }
+    th, td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    th {
+        background: #f8f9fa;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    tr:hover { background: #f8f9fa; }
+
+    /* ====== CHECKLIST ====== */
+    .checklist {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    .checklist label {
+        display: block;
+        padding: 8px 0;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .checklist input {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+
+    /* ====== COMPARE ====== */
+    .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 15px 0;
+    }
+    .compare > div {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .compare .label {
+        padding: 10px 15px;
+        font-weight: bold;
+        color: #fff;
+        font-size: 14px;
+    }
+    .compare .rentan .label { background: #e74c3c; }
+    .compare .aman .label { background: #27ae60; }
+    .compare .code {
+        margin: 0;
+        border-radius: 0;
+        border-left: none;
+    }
+
+    /* ====== FOOTER ====== */
+    .footer {
+        text-align: center;
+        padding: 30px;
+        color: #7f8c8d;
+        font-size: 13px;
+        margin-left: 280px;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 900px) {
+        .sidebar {
+            position: relative;
+            width: 100%;
+            height: auto;
+            padding: 20px 15px;
+        }
+        .content { margin-left: 0; padding: 20px; }
+        .footer { margin-left: 0; }
+        .section { padding: 25px 20px; }
+        .header { padding: 25px; }
+        .header h1 { font-size: 22px; }
+        .compare { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ==================== SIDEBAR ==================== -->
+<nav class="sidebar">
+    <h2>🔐 Lab SQL Injection</h2>
+    <a href="#step1"><span class="step-num">1</span>Pengenalan</a>
+    <a href="#step2"><span class="step-num">2</span>Install PHP</a>
+    <a href="#step3"><span class="step-num">3</span>Setup Database</a>
+    <a href="#step4"><span class="step-num">4</span>Versi Rentan</a>
+    <a href="#step5"><span class="step-num">5</span>Versi Aman</a>
+    <a href="#step6"><span class="step-num">6</span>Jalankan Server</a>
+    <a href="#step7"><span class="step-num">7</span>Uji SQL Injection</a>
+    <a href="#step8"><span class="step-num">8</span>Pencegahan</a>
+    <a href="#step9"><span class="step-num">9</span>Troubleshooting</a>
+</nav>
+
+<!-- ==================== CONTENT ==================== -->
+<div class="content">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>🔐 Lab SQL Injection — PHP + PostgreSQL</h1>
+        <p>Belajar bagaimana SQL Injection terjadi & cara mencegahnya</p>
+        <div class="warning">
+            <strong>⚠️ Peringatan:</strong> Materi ini untuk <b>pembelajaran</b>. Uji SQL Injection hanya di lab lokal milik sendiri. Menguji website orang lain tanpa izin = <b>pidana</b> (UU ITE).
+        </div>
+    </div>
+
+    <!-- ============ STEP 1 ============ -->
+    <section class="section" id="step1">
+        <h2><span class="badge">STEP 1</span> Pengenalan</h2>
+
+        <h3>Apa yang Akan Kita Buat?</h3>
+        <p>Form login sederhana dengan <strong>PHP + PostgreSQL</strong>. Ada 2 versi:</p>
+
+        <table>
+            <tr>
+                <th>Versi</th>
+                <th>File</th>
+                <th>Fungsi</th>
+            </tr>
+            <tr>
+                <td><strong>Rentan</strong></td>
+                <td><code>index.php</code></td>
+                <td>Demo SQL Injection (sengaja salah)</td>
+            </tr>
+            <tr>
+                <td><strong>Aman</strong></td>
+                <td><code>aman.php</code></td>
+                <td>Demo pencegahan (parameterized query)</td>
+            </tr>
+        </table>
+
+        <h3>Alur</h3>
+        <div class="code">[Browser] → [PHP] → [PostgreSQL]
+    ↑          ↑         ↑
+  Form      Proses    Database</div>
+
+        <h3>Yang Akan Dipelajari</h3>
+        <ul>
+            <li>Cara <strong>SQL Injection</strong> terjadi</li>
+            <li>Payload <code>admin'--</code> dan <code>' OR 1=1--</code></li>
+            <li>Cara <strong>mencegah</strong> dengan parameterized query</li>
+            <li>Perbedaan kode rentan vs aman</li>
+        </ul>
+
+        <div class="box box-info">
+            <strong>💡 Kenapa PHP?</strong>
+            PHP paling praktis untuk demo — 1 file, langsung jalan, tidak butuh framework.
+        </div>
+    </section>
+
+    <!-- ============ STEP 2 ============ -->
+    <section class="section" id="step2">
+        <h2><span class="badge">STEP 2</span> Install PHP</h2>
+
+        <h3>Cek PHP</h3>
+        <div class="code">php --version</div>
+        <p>Kalau belum ada, install lewat Homebrew (Mac):</p>
+        <div class="code">brew install php</div>
+
+        <h3>Cek Driver PostgreSQL</h3>
+        <div class="code">php -m | grep -i pgsql</div>
+        <p>Harus muncul dua baris:</p>
+        <div class="code"><span class="ok">pdo_pgsql</span>
+<span class="ok">pgsql</span></div>
+
+        <div class="box box-warning">
+            <strong>⚠️ Kalau Driver Tidak Muncul</strong>
+            <ul>
+                <li>Coba <code>brew reinstall php</code></li>
+                <li>Homebrew PHP biasanya sudah include <code>pdo_pgsql</code></li>
+            </ul>
+        </div>
+
+        <h3>Cek PostgreSQL</h3>
+        <div class="code">psql -h localhost -p 5432</div>
+        <p>Kalau berhasil masuk, berarti PostgreSQL sudah jalan.</p>
+
+        <h3>✅ Checklist</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> PHP terinstal (<code>php --version</code>)</label>
+            <label><input type="checkbox"> Driver <code>pdo_pgsql</code> ada</label>
+            <label><input type="checkbox"> PostgreSQL jalan</label>
+            <label><input type="checkbox"> Bisa masuk psql</label>
+        </div>
+    </section>
+
+    <!-- ============ STEP 3 ============ -->
+    <section class="section" id="step3">
+        <h2><span class="badge">STEP 3</span> Setup Database</h2>
+
+        <h3>Buat Folder Project</h3>
+        <div class="code">mkdir ~/lab-login-php
+cd ~/lab-login-php</div>
+
+        <h3>Masuk ke psql</h3>
+        <div class="code">psql -h localhost -p 5432</div>
+
+        <h3>Buat Database & Tabel</h3>
+        <div class="code"><span class="kw">CREATE DATABASE</span> lab_login;
+<span class="kw">\c</span> lab_login
+
+<span class="kw">CREATE TABLE</span> users (
+    id <span class="kw">SERIAL PRIMARY KEY</span>,
+    username <span class="kw">VARCHAR</span>(<span class="num">50</span>) <span class="kw">UNIQUE NOT NULL</span>,
+    password <span class="kw">VARCHAR</span>(<span class="num">50</span>) <span class="kw">NOT NULL</span>
+);
+
+<span class="kw">INSERT INTO</span> users (username, password) <span class="kw">VALUES</span>
+(<span class="str">'admin'</span>, <span class="str">'admin123'</span>),
+(<span class="str">'budi'</span>, <span class="str">'rahasia456'</span>),
+(<span class="str">'ani'</span>, <span class="str">'ani789'</span>);
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users;</div>
+
+        <h3>Cek Hasil</h3>
+        <div class="code"> id | username | password
+----+----------+-----------
+  1 | admin    | admin123
+  2 | budi     | rahasia456
+  3 | ani      | ani789</div>
+
+        <p>Keluar dari psql:</p>
+        <div class="code"><span class="kw">\q</span></div>
+
+        <div class="box box-info">
+            <strong>💡 Catatan User</strong>
+            Di Mac, user PostgreSQL default = user macOS kamu (misal <code>yusufyacobonaola</code>), bukan <code>postgres</code>. Sesuaikan di kode PHP.
+        </div>
+    </section>
+
+    <!-- ============ STEP 4 ============ -->
+    <section class="section" id="step4">
+        <h2><span class="badge">STEP 4</span> Versi Rentan (index.php)</h2>
+
+        <p>Buat file <code>index.php</code> di folder <code>~/lab-login-php</code>.</p>
+
+        <h3>Kode Lengkap</h3>
+        <div class="code"><span class="kw">&lt;?php</span>
+<span class="cmt">// ===== KONEKSI DATABASE =====</span>
+<span class="var">$host</span> = <span class="str">'localhost'</span>;
+<span class="var">$port</span> = <span class="str">'5432'</span>;
+<span class="var">$dbname</span> = <span class="str">'lab_login'</span>;
+<span class="var">$user</span> = <span class="str">'yusufyacobonaola'</span>;   <span class="cmt">// ganti sesuai user macOS kamu</span>
+<span class="var">$password</span> = <span class="str">''</span>;                <span class="cmt">// kosong</span>
+
+<span class="kw">try</span> {
+    <span class="var">$pdo</span> = <span class="kw">new</span> <span class="func">PDO</span>(<span class="str">"pgsql:host=$host;port=$port;dbname=$dbname"</span>, <span class="var">$user</span>, <span class="var">$password</span>);
+    <span class="var">$pdo</span>-><span class="func">setAttribute</span>(<span class="func">PDO</span>::<span class="var">ATTR_ERRMODE</span>, <span class="func">PDO</span>::<span class="var">ERRMODE_EXCEPTION</span>);
+} <span class="kw">catch</span> (<span class="func">PDOException</span> <span class="var">$e</span>) {
+    <span class="kw">die</span>(<span class="str">"Koneksi gagal: "</span> . <span class="var">$e</span>-><span class="func">getMessage</span>());
+}
+
+<span class="cmt">// ===== PROSES LOGIN =====</span>
+<span class="var">$query</span> = <span class="str">''</span>;
+<span class="var">$rows</span> = [];
+<span class="var">$sukses</span> = <span class="kw">false</span>;
+<span class="var">$error</span> = <span class="str">''</span>;
+
+<span class="kw">if</span> (<span class="var">$_SERVER</span>[<span class="str">'REQUEST_METHOD'</span>] === <span class="str">'POST'</span>) {
+    <span class="var">$username</span> = <span class="var">$_POST</span>[<span class="str">'username'</span>];
+    <span class="var">$password</span> = <span class="var">$_POST</span>[<span class="str">'password'</span>];
+
+    <span class="cmt">// ❌❌❌ INI YANG SALAH — GABUNG STRING LANGSUNG ❌❌❌</span>
+    <span class="var">$query</span> = <span class="str">"SELECT * FROM users WHERE username = '$username' AND password = '$password'"</span>;
+
+    <span class="kw">try</span> {
+        <span class="var">$stmt</span> = <span class="var">$pdo</span>-><span class="func">query</span>(<span class="var">$query</span>);
+        <span class="var">$rows</span> = <span class="var">$stmt</span>-><span class="func">fetchAll</span>(<span class="func">PDO</span>::<span class="var">FETCH_ASSOC</span>);
+        <span class="var">$sukses</span> = <span class="func">count</span>(<span class="var">$rows</span>) > <span class="num">0</span>;
+    } <span class="kw">catch</span> (<span class="func">PDOException</span> <span class="var">$e</span>) {
+        <span class="var">$error</span> = <span class="str">'Error: '</span> . <span class="var">$e</span>-><span class="func">getMessage</span>();
+    }
+}
+<span class="kw">?&gt;</span>
+
+<span class="cmt">&lt;!-- HTML form --&gt;</span>
+<span class="kw">&lt;form</span> method=<span class="str">"POST"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;input</span> type=<span class="str">"text"</span> name=<span class="str">"username"</span> required<span class="kw">&gt;</span>
+    <span class="kw">&lt;input</span> type=<span class="str">"text"</span> name=<span class="str">"password"</span> required<span class="kw">&gt;</span>
+    <span class="kw">&lt;button</span> type=<span class="str">"submit"</span><span class="kw">&gt;</span>Login<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;/form&gt;</span></div>
+
+        <div class="box box-danger">
+            <strong>🚨 Bagian RENTAN</strong>
+            <div class="code" style="margin-top:8px; border-left-color: #e74c3c;"><span class="var">$query</span> = <span class="str">"SELECT * FROM users WHERE username = '$username' AND password = '$password'"</span>;</div>
+            Input user <strong>digabung langsung</strong> ke string query. Ini pintu masuk SQL Injection.
+        </div>
+
+        <h3>Cara Kerja</h3>
+        <ol>
+            <li>User isi form → dikirim ke PHP</li>
+            <li>PHP gabung input ke string query</li>
+            <li>Query dikirim ke PostgreSQL</li>
+            <li>PostgreSQL eksekusi query</li>
+        </ol>
+    </section>
+
+    <!-- ============ STEP 5 ============ -->
+    <section class="section" id="step5">
+        <h2><span class="badge">STEP 5</span> Versi Aman (aman.php)</h2>
+
+        <p>Buat file <code>aman.php</code> di folder yang sama.</p>
+
+        <h3>Kode Lengkap</h3>
+        <div class="code"><span class="kw">&lt;?php</span>
+<span class="cmt">// ===== KONEKSI DATABASE =====</span>
+<span class="var">$host</span> = <span class="str">'localhost'</span>;
+<span class="var">$port</span> = <span class="str">'5432'</span>;
+<span class="var">$dbname</span> = <span class="str">'lab_login'</span>;
+<span class="var">$user</span> = <span class="str">'yusufyacobonaola'</span>;
+<span class="var">$password</span> = <span class="str">''</span>;
+
+<span class="kw">try</span> {
+    <span class="var">$pdo</span> = <span class="kw">new</span> <span class="func">PDO</span>(<span class="str">"pgsql:host=$host;port=$port;dbname=$dbname"</span>, <span class="var">$user</span>, <span class="var">$password</span>);
+    <span class="var">$pdo</span>-><span class="func">setAttribute</span>(<span class="func">PDO</span>::<span class="var">ATTR_ERRMODE</span>, <span class="func">PDO</span>::<span class="var">ERRMODE_EXCEPTION</span>);
+} <span class="kw">catch</span> (<span class="func">PDOException</span> <span class="var">$e</span>) {
+    <span class="kw">die</span>(<span class="str">"Koneksi gagal: "</span> . <span class="var">$e</span>-><span class="func">getMessage</span>());
+}
+
+<span class="cmt">// ===== PROSES LOGIN =====</span>
+<span class="var">$query</span> = <span class="str">''</span>;
+<span class="var">$rows</span> = [];
+<span class="var">$sukses</span> = <span class="kw">false</span>;
+<span class="var">$error</span> = <span class="str">''</span>;
+
+<span class="kw">if</span> (<span class="var">$_SERVER</span>[<span class="str">'REQUEST_METHOD'</span>] === <span class="str">'POST'</span>) {
+    <span class="var">$username</span> = <span class="var">$_POST</span>[<span class="str">'username'</span>];
+    <span class="var">$password</span> = <span class="var">$_POST</span>[<span class="str">'password'</span>];
+
+    <span class="cmt">// ✅✅✅ PARAMETERIZED QUERY — AMAN ✅✅✅</span>
+    <span class="var">$query</span> = <span class="str">"SELECT * FROM users WHERE username = :username AND password = :password"</span>;
+
+    <span class="kw">try</span> {
+        <span class="var">$stmt</span> = <span class="var">$pdo</span>-><span class="func">prepare</span>(<span class="var">$query</span>);
+        <span class="var">$stmt</span>-><span class="func">execute</span>([
+            <span class="str">':username'</span> => <span class="var">$username</span>,
+            <span class="str">':password'</span> => <span class="var">$password</span>
+        ]);
+        <span class="var">$rows</span> = <span class="var">$stmt</span>-><span class="func">fetchAll</span>(<span class="func">PDO</span>::<span class="var">FETCH_ASSOC</span>);
+        <span class="var">$sukses</span> = <span class="func">count</span>(<span class="var">$rows</span>) > <span class="num">0</span>;
+    } <span class="kw">catch</span> (<span class="func">PDOException</span> <span class="var">$e</span>) {
+        <span class="var">$error</span> = <span class="str">'Error: '</span> . <span class="var">$e</span>-><span class="func">getMessage</span>();
+    }
+}
+<span class="kw">?&gt;</span>
+
+<span class="cmt">&lt;!-- HTML form (sama seperti index.php) --&gt;</span></div>
+
+        <div class="box box-success">
+            <strong>✅ Bagian AMAN</strong>
+            <ul>
+                <li><code>:username</code> dan <code>:password</code> = placeholder</li>
+                <li>PHP kirim nilai terpisah lewat <code>execute()</code></li>
+                <li>PostgreSQL tidak bisa dipotong query-nya</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ============ STEP 6 ============ -->
+    <section class="section" id="step6">
+        <h2><span class="badge">STEP 6</span> Jalankan Server</h2>
+
+        <p>Masuk ke folder project:</p>
+        <div class="code">cd ~/lab-login-php</div>
+
+        <p>Jalankan built-in server PHP:</p>
+        <div class="code">php -S localhost:8000</div>
+
+        <p>Output:</p>
+        <div class="code"><span class="ok">PHP 8.5.10 Development Server (http://localhost:8000) started</span></div>
+
+        <h3>Buka di Browser</h3>
+        <table>
+            <tr><th>Versi</th><th>URL</th></tr>
+            <tr><td>Rentan</td><td><code>http://localhost:8000/index.php</code></td></tr>
+            <tr><td>Aman</td><td><code>http://localhost:8000/aman.php</code></td></tr>
+        </table>
+
+        <div class="box box-info">
+            <strong>💡 Catatan</strong>
+            Biarkan terminal server tetap terbuka. Buka browser baru untuk testing.
+        </div>
+    </section>
+
+    <!-- ============ STEP 7 ============ -->
+    <section class="section" id="step7">
+        <h2><span class="badge">STEP 7</span> Uji SQL Injection</h2>
+
+        <h3>Tes 1: Login Normal</h3>
+        <table>
+            <tr><th>Field</th><th>Isi</th></tr>
+            <tr><td>Username</td><td><code>admin</code></td></tr>
+            <tr><td>Password</td><td><code>admin123</code></td></tr>
+        </table>
+        <p><strong>Hasil:</strong> ✅ Login berhasil</p>
+        <p><strong>Query:</strong></p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> username = <span class="str">'admin'</span> <span class="kw">AND</span> password = <span class="str">'admin123'</span></div>
+
+        <h3>Tes 2: 🚨 SQL Injection — Bypass Password</h3>
+        <table>
+            <tr><th>Field</th><th>Isi</th></tr>
+            <tr><td>Username</td><td><code>admin'--</code></td></tr>
+            <tr><td>Password</td><td><code>apapun</code></td></tr>
+        </table>
+        <p><strong>Hasil:</strong> ✅ <strong>Login BERHASIL!</strong> 🚨</p>
+        <p><strong>Query:</strong></p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> username = <span class="str">'admin'</span><span class="err">--' AND password = 'apapun'</span></div>
+
+        <div class="box box-danger">
+            <strong>💀 Yang Terjadi</strong>
+            <ul>
+                <li><code>--</code> = komentar SQL</li>
+                <li>Bagian <code>' AND password = 'apapun'</code> diabaikan</li>
+                <li>Query jadi: <code>SELECT * FROM users WHERE username = 'admin'</code></li>
+                <li>Password <strong>tidak dicek</strong></li>
+            </ul>
+        </div>
+
+        <h3>Tes 3: 🚨 SQL Injection — OR 1=1</h3>
+        <table>
+            <tr><th>Field</th><th>Isi</th></tr>
+            <tr><td>Username</td><td><code>' OR 1=1--</code></td></tr>
+            <tr><td>Password</td><td><code>apapun</code></td></tr>
+        </table>
+        <p><strong>Hasil:</strong> Semua user muncul di tabel</p>
+        <p><strong>Query:</strong></p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> username = <span class="str">''</span> <span class="kw">OR</span> <span class="num">1</span>=<span class="num">1</span><span class="err">--' AND password = 'apapun'</span></div>
+        <p><code>1=1</code> selalu TRUE → semua baris dikembalikan.</p>
+
+        <h3>Tes 4: Versi Aman</h3>
+        <p>Buka <code>aman.php</code>, coba lagi <code>admin'--</code>:</p>
+        <p><strong>Hasil:</strong> ❌ Login GAGAL ✅</p>
+        <p><strong>Query:</strong></p>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> username = :username <span class="kw">AND</span> password = :password
+<span class="cmt">-- Values: username = "admin'--", password = "apapun"</span></div>
+        <p>Nilai <code>admin'--</code> dianggap <strong>string biasa</strong>, bukan perintah SQL.</p>
+
+        <h3>✅ Checklist Uji Coba</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> Login normal berhasil</label>
+            <label><input type="checkbox"> Login salah gagal</label>
+            <label><input type="checkbox"> <code>admin'--</code> bypass di versi rentan</label>
+            <label><input type="checkbox"> <code>' OR 1=1--</code> tampil semua user</label>
+            <label><input type="checkbox"> <code>admin'--</code> GAGAL di versi aman</label>
+        </div>
+    </section>
+
+    <!-- ============ STEP 8 ============ -->
+    <section class="section" id="step8">
+        <h2><span class="badge">STEP 8</span> Pencegahan</h2>
+
+        <h3>Bandingkan Kode</h3>
+        <div class="compare">
+            <div class="rentan">
+                <div class="label">❌ RENTAN</div>
+                <div class="code"><span class="var">$query</span> = <span class="str">"SELECT * FROM users
+WHERE username = '$username'
+AND password = '$password'"</span>;
+
+<span class="var">$stmt</span> = <span class="var">$pdo</span>-><span class="func">query</span>(<span class="var">$query</span>);</div>
+            </div>
+            <div class="aman">
+                <div class="label">✅ AMAN</div>
+                <div class="code"><span class="var">$query</span> = <span class="str">"SELECT * FROM users
+WHERE username = :username
+AND password = :password"</span>;
+
+<span class="var">$stmt</span> = <span class="var">$pdo</span>-><span class="func">prepare</span>(<span class="var">$query</span>);
+<span class="var">$stmt</span>-><span class="func">execute</span>([
+    <span class="str">':username'</span> => <span class="var">$username</span>,
+    <span class="str">':password'</span> => <span class="var">$password</span>
+]);</div>
+            </div>
+        </div>
+
+        <h3>Checklist Anti SQL Injection</h3>
+        <div class="checklist">
+            <label><input type="checkbox"> Selalu pakai <strong>parameterized query</strong> (<code>:nama</code>)</label>
+            <label><input type="checkbox"> Jangan pernah gabung string jadi SQL</label>
+            <label><input type="checkbox"> Validasi input di server (bukan cuma HTML)</label>
+            <label><input type="checkbox"> Batasi hak akses user database (least privilege)</label>
+            <label><input type="checkbox"> Jangan tampilkan error SQL ke user</label>
+            <label><input type="checkbox"> Hash password (bcrypt/argon2)</label>
+            <label><input type="checkbox"> Log semua aktivitas login</label>
+            <label><input type="checkbox"> Update PHP & PostgreSQL rutin</label>
+        </div>
+
+        <h3>Contoh Hash Password di PHP</h3>
+        <div class="code"><span class="cmt">// Saat registrasi</span>
+<span class="var">$hash</span> = <span class="func">password_hash</span>(<span class="var">$password</span>, <span class="var">PASSWORD_BCRYPT</span>);
+
+<span class="cmt">// Saat login</span>
+<span class="kw">if</span> (<span class="func">password_verify</span>(<span class="var">$password</span>, <span class="var">$hash_dari_db</span>)) {
+    <span class="cmt">// Login berhasil</span>
+}</div>
+
+        <h3>Buat User Database Terbatas</h3>
+        <div class="code"><span class="kw">CREATE USER</span> app_user <span class="kw">WITH PASSWORD</span> <span class="str">'StrongP@ss!'</span>;
+<span class="kw">GRANT SELECT, INSERT, UPDATE, DELETE</span>
+    <span class="kw">ON ALL TABLES IN SCHEMA</span> public <span class="kw">TO</span> app_user;
+<span class="cmt">-- JANGAN kasih SUPERUSER</span></div>
+    </section>
+
+    <!-- ============ STEP 9 ============ -->
+    <section class="section" id="step9">
+        <h2><span class="badge">STEP 9</span> Troubleshooting</h2>
+
+        <table>
+            <tr>
+                <th>Error</th>
+                <th>Penyebab</th>
+                <th>Solusi</th>
+            </tr>
+            <tr>
+                <td><code>could not find driver</code></td>
+                <td><code>pdo_pgsql</code> tidak aktif</td>
+                <td><code>brew reinstall php</code></td>
+            </tr>
+            <tr>
+                <td><code>role "postgres" does not exist</code></td>
+                <td>User bukan postgres</td>
+                <td>Ganti <code>$user</code> jadi user macOS kamu</td>
+            </tr>
+            <tr>
+                <td><code>password authentication failed</code></td>
+                <td>Password salah</td>
+                <td>Ganti <code>$password</code> jadi <code>''</code> (kosong)</td>
+            </tr>
+            <tr>
+                <td><code>database "lab_login" does not exist</code></td>
+                <td>DB belum dibuat</td>
+                <td>Buat dulu di psql</td>
+            </tr>
+            <tr>
+                <td><code>Connection refused</code></td>
+                <td>PostgreSQL belum jalan</td>
+                <td><code>brew services start postgresql@17</code></td>
+            </tr>
+            <tr>
+                <td><code>bind message supplies 0 parameters</code></td>
+                <td>Campur <code>query()</code> dan <code>prepare()</code></td>
+                <td>Pilih satu: query atau prepare</td>
+            </tr>
+            <tr>
+                <td>Prompt psql <code>*#</code></td>
+                <td>Di dalam komentar <code>/* */</code></td>
+                <td>Ketik <code>*/</code> atau <code>Ctrl+C</code></td>
+            </tr>
+            <tr>
+                <td>Prompt psql <code>-#</code></td>
+                <td>Belum akhiri <code>;</code></td>
+                <td>Ketik <code>;</code></td>
+            </tr>
+        </table>
+
+        <h3>Cara Keluar dari psql</h3>
+        <div class="code"><span class="kw">\q</span></div>
+
+        <h3>Cara Stop Server PHP</h3>
+        <div class="code">Ctrl + C</div>
+    </section>
+
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer">
+    <p>🔐 Materi Lab SQL Injection — PHP + PostgreSQL</p>
+    <p>Dibuat untuk siswa cyber security • 2026</p>
+    <p style="margin-top: 10px; font-size: 12px;">⚠️ Hanya untuk lab lokal. Jangan uji website tanpa izin.</p>
+</div>
+
+<!-- ==================== SCRIPT SIDEBAR ==================== -->
+<script>
+    var sidebarLinks = document.querySelectorAll('.sidebar a');
+    sidebarLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetId = this.getAttribute('href');
+            var target = document.querySelector(targetId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    function updateActiveMenu() {
+        var scrollPos = window.scrollY + 120;
+        var currentId = '';
+
+        document.querySelectorAll('.section').forEach(function(section) {
+            var top = section.offsetTop;
+            var bottom = top + section.offsetHeight;
+            if (scrollPos >= top && scrollPos < bottom) {
+                currentId = section.getAttribute('id');
+            }
+        });
+
+        if (currentId) {
+            sidebarLinks.forEach(function(l) {
+                l.classList.remove('active');
+                if (l.getAttribute('href') === '#' + currentId) {
+                    l.classList.add('active');
+                }
+            });
+        }
+    }
+
+    window.addEventListener('scroll', updateActiveMenu);
+    window.addEventListener('load', updateActiveMenu);
+
+    document.querySelectorAll('.checklist input[type="checkbox"]').forEach(function(cb, idx) {
+        var key = 'sqli_checklist_' + idx;
+        if (localStorage.getItem(key) === '1') {
+            cb.checked = true;
+        }
+        cb.addEventListener('change', function() {
+            localStorage.setItem(key, cb.checked ? '1' : '0');
+        });
+    });
+</script>
+
+</body>
+</html>
